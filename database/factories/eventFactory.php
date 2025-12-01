@@ -21,8 +21,14 @@ class eventFactory extends Factory
         return [
             'event_code' => 'E' . $this->faker->unique()->numerify('###'),
             'company_id' => Company::inRandomOrder()->first()->id,
-            'title' => $this->faker->sentence(3),
-            'description' => $this->faker->text(100),
+            'title' => $this->faker->catchPhrase(),
+            'description' => $this->faker->paragraph(),
+            'location' => $this->faker->streetAddress() . ', ' .
+               $this->faker->city() . ', ' .
+               $this->faker->state() . ', Indonesia',
+            'date' => $this->faker->dateTimeBetween('+1 week', '+3 months')->format('Y-m-d'),
+            'time' => $this->faker->time('H:i'),
+            'quota' => $this->faker->numberBetween(20, 200),
         ];
     }
 }

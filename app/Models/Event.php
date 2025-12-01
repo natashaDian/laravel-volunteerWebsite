@@ -16,5 +16,14 @@ class Event extends Model
         'company_id',
         'title',
         'description',
+        'location',
+        'date',
+        'time',
+        'quota',
     ];
+
+     public function registrations()
+    {
+        return $this->hasMany(EventRegistration::class);
+    }
 }
