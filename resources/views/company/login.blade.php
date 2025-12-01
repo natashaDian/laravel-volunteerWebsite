@@ -2,7 +2,7 @@
 
     <!-- Header -->
     <div class="mb-6 text-center">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+        <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">
             Admin Login
         </h1>
 
@@ -31,7 +31,7 @@
         </div>
 
         <!-- Password -->
-        <div>
+        <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
             <x-text-input id="password" class="block w-full"
                           type="password" name="password" required
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Remember Me -->
-        <div class="flex items-center">
+        <div class="flex items-center mt-4">
             <input id="remember_me" type="checkbox" name="remember"
                    class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800">
             <label for="remember_me" class="ml-2 text-sm text-gray-600 dark:text-gray-400">
@@ -49,7 +49,7 @@
         </div>
 
         <!-- Submit -->
-        <div>
+        <div class="mt-4">
             <x-primary-button class="w-full justify-center">
                 {{ __('Log in as Company') }}
             </x-primary-button>

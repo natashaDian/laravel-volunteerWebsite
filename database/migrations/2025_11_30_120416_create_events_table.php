@@ -17,6 +17,11 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained('companies')->onDelete('cascade');
             $table->string('title');
             $table->string('description')->nullable();
+
+            $table->string('location');
+            $table->date('date');
+            $table->time('time');
+            $table->integer('quota');
             $table->timestamps();
         });
     }
