@@ -18,14 +18,30 @@
                         </x-nav-link>
                     @endif
 
+                     <!-- Menambahkan menu Find Activities -->
+                       <x-nav-link :href="route('activities.index')" :active="request()->routeIs('activities.index')">
+                            {{ __('Find Activities') }}
+                        </x-nav-link>
+
+                        <style>
+                            .nav-link[href*="activities"]:hover {
+                                text-decoration: underline;
+                                color: purple;
+                        }
+                        </style>
+
+
+
                     {{-- COMPANY DASHBOARD --}}
                     @if (auth('company')->check())
                         <x-nav-link :href="route('company.dashboard')" :active="request()->routeIs('company.dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+
                         <x-nav-link :href="route('company.events.create')" :active="request()->routeIs('company.events.create')">
                             {{ __('Create Event') }}
                         </x-nav-link>
+
                     @endif
                 </div>
             </div>
@@ -35,7 +51,14 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ Auth::user()->name }}</div>
+                            <div>
+                                @auth
+                                      {{ Auth::user()->name }}
+                                @else
+                                      Guest
+                                @endauth
+                            </div>
+
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">

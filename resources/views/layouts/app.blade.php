@@ -30,6 +30,12 @@
             <!-- Page Content -->
             <main>
                 {{ $slot }}
+                {{-- @yield('content')  //biar bisa jalan find activitiesnya hiks --}}
+            </main>
+
+            <main>
+                {{-- {{ $slot }} --}}
+                @yield('content')  //biar bisa jalan find activitiesnya hiks
             </main>
         </div>
     </body>
