@@ -98,6 +98,11 @@ Create tables with:
 php artisan migrate
 ```
 
+IF YOU WANT TO RESTART THE SEEDER AND MIGRATION, JUST RUN THIS:
+```bash
+php artisan migrate:fresh 
+```
+
 After migration, verify these tables exist:
 
 * companies
