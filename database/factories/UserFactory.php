@@ -32,7 +32,7 @@ class UserFactory extends Factory
             'password' => bcrypt('password'),
             'phone' => $this->faker->phoneNumber(),
             'address' => $this->faker->address(),
-            'remember_token' => \Str::random(10),
+            'remember_token' => Str::random(10),
         ];
     }
 

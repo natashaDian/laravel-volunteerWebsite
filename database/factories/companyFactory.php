@@ -3,27 +3,33 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use App\Models\Company;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\company>
- */
-class companyFactory extends Factory
+class CompanyFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'company_code' => 'C' . $this->faker->unique()->numerify('###'),
+            // company_code & name akan dioverride di seeder
+            'company_code' => null,
             'name' => $this->faker->company(),
+
+            // field yang random dari faker
             'email' => $this->faker->unique()->companyEmail(),
-            'password' => bcrypt('password'),
+            'password' => bcrypt('password'), // default password untuk seed
             'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),
         ];
+    }
+
+    /**
+     * Optional: state helper supaya bisa dipanggil seperti:
+     * Company::factory()->company('COO1','Caring Hands')->create();
+     */
+    public function company(string $code, string $name)
+    {
+        return $this->state(fn() => [
+            'company_code' => $code,
+            'name' => $name,
+        ]);
     }
 }

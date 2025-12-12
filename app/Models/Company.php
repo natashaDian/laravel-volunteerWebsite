@@ -26,4 +26,12 @@ class Company extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    // Company.php
+    public function activities()
+    {
+        // company_code on Company matches company_code on Activity
+        return $this->hasMany(\App\Models\Activity::class, 'company_code', 'company_code');
+    }
+
 }
