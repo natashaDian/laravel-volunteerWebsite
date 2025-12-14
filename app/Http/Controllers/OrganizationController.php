@@ -19,16 +19,21 @@ class OrganizationController extends Controller
                 ->orWhere('company_code', 'like', "%{$q}%");
         }
 
-        // withCount untuk mencegah N+1, menghitung jumlah activities per company
-        // jika mau hitung "open events" saja, ganti closure di bawah sesuai kriteria
-        $query->withCount(['activities as activities_count' => function($q) {
-            // contoh: hitung activities yang belum berakhir (end_date >= today) atau tanpa end_date
-            $today = now()->toDateString();
-            $q->where(function($sub) use ($today) {
-                $sub->whereNull('end_date')
-                    ->orWhereDate('end_date', '>=', $today);
-            });
-        }]);
+        $today = now()->toDateString();
+
+        $query->withCount([
+            // 🟢 ONGOING: sedang berlangsung
+            'activities as ongoing_count' => function ($q) use ($today) {
+                $q->whereDate('start_date', '<=', $today)
+                ->whereDate('end_date', '>=', $today);
+            },
+
+            // 🟡 UPCOMING: belum mulai
+            'activities as upcoming_count' => function ($q) use ($today) {
+                $q->whereDate('start_date', '>', $today);
+            },
+        ]);
+
 
         $companies = $query->orderBy('name')->paginate(12)->withQueryString();
 
@@ -36,12 +41,32 @@ class OrganizationController extends Controller
     }
 
 
-    public function show(Company $company)
+    public function show($id)
     {
-        $activities = Activity::where('company_code', $company->company_code)
-                              ->orderBy('start_date', 'desc')
-                              ->paginate(12);
+        $company = Company::findOrFail($id);
 
-        return view('organizations.show', compact('company', 'activities'));
+        $activities = Activity::where('company_code', $company->company_code)
+            ->orderBy('start_date', 'asc')
+            ->get();
+
+        $today = now()->startOfDay();
+
+        // ONGOING: sudah mulai
+        $ongoingCount = Activity::where('company_code', $company->company_code)
+            ->whereDate('start_date', '<=', $today)
+            ->count();
+
+        // UPCOMING: belum mulai
+        $upcomingCount = Activity::where('company_code', $company->company_code)
+            ->whereDate('start_date', '>', $today)
+            ->count();
+
+        return view('organizations.show', compact(
+            'company',
+            'activities',
+            'ongoingCount',
+            'upcomingCount'
+        ));
     }
+
 }

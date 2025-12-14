@@ -1,83 +1,172 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Organizations</h2>
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            Organizations
+        </h2>
     </x-slot>
 
-    <div class="max-w-7xl mx-auto py-8 px-4 space-y-6">
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    {{-- PAGE WRAPPER --}}
+    <div class="max-w-7xl mx-auto pt-16 pb-12 px-4 space-y-10">
+
+        {{-- HEADER + SEARCH --}}
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-                <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300">Partner Organizations</h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400">Browse organizations that need volunteers.</p>
+                <h3 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                    Partner Organizations
+                </h3>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Browse organizations that need volunteers.
+                </p>
             </div>
 
-            <form method="GET" action="{{ route('organizations.index') }}" class="flex gap-2 w-full md:w-auto">
-                <input name="q" value="{{ $q ?? '' }}" placeholder="Search organizations..." class="px-3 py-2 border rounded w-full md:w-72" />
-                <button class="px-3 py-2 bg-indigo-600 text-white rounded">Search</button>
+            <form method="GET" action="{{ route('organizations.index') }}"
+                  class="flex gap-2 w-full md:w-auto">
+                <input
+                    name="q"
+                    value="{{ $q ?? '' }}"
+                    placeholder="Search organizations..."
+                    class="px-4 py-2 border border-gray-300 rounded-xl
+                           w-full md:w-72
+                           focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                />
+                <button
+                    class="px-5 py-2 bg-indigo-600 text-white
+                           rounded-xl font-semibold hover:bg-indigo-700 transition">
+                    Search
+                </button>
             </form>
         </div>
 
-        <div class="space-y-4">
+        {{-- ORGANIZATION LIST --}}
+        <div class="space-y-8">
             @forelse($companies as $company)
-                <a href="{{ route('organizations.show', $company->id) }}" class="block">
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow hover:shadow-lg transition">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                            {{-- LEFT: logo / image --}}
-                            <div class="flex-shrink-0 w-full sm:w-36 h-36 sm:h-24 rounded overflow-hidden bg-gray-100 dark:bg-gray-700">
-                                @php
-                                    // choose image: prefer company->logo (if exists), then public/img/company-<code>.jpg, else default
-                                    $logo = $company->logo ?? null;
-                                    $imgPath = $logo ? (filter_var($logo, FILTER_VALIDATE_URL) ? $logo : asset($logo)) : (file_exists(public_path("img/company-{$company->company_code}.jpg")) ? asset("img/company-{$company->company_code}.jpg") : asset('images/company-default.jpg'));
-                                @endphp
-                                <img src="{{ $imgPath }}" alt="{{ $company->name }}" class="w-full h-full object-cover">
+
+                @php
+                    /**
+                     * IMAGE DETECTION LOGIC
+                     * 1. company->logo
+                     * 2. public/img/{normalized_name}.(png|jpg|jpeg|webp)
+                     * 3. default image
+                     */
+
+                    $imgPath = asset('images/company-default.jpg');
+
+                    if (!empty($company->logo)) {
+                        $imgPath = filter_var($company->logo, FILTER_VALIDATE_URL)
+                            ? $company->logo
+                            : asset($company->logo);
+                    } else {
+                        $normalized = strtolower($company->name);
+                        $normalized = preg_replace('/[^a-z0-9]+/', '_', $normalized);
+                        $normalized = trim($normalized, '_');
+
+                        foreach (['png','jpg','jpeg','webp'] as $ext) {
+                            if (file_exists(public_path("img/{$normalized}.{$ext}"))) {
+                                $imgPath = asset("img/{$normalized}.{$ext}");
+                                break;
+                            }
+                        }
+                    }
+                @endphp
+
+                <a href="{{ route('organizations.show', $company->id) }}"
+                   class="block group">
+
+                    <div class="relative bg-white dark:bg-gray-800
+                                rounded-2xl p-6
+                                shadow-md hover:shadow-2xl
+                                transition hover:-translate-y-1">
+
+                        {{-- LEFT ACCENT --}}
+                        <div class="absolute left-0 top-6 bottom-6 w-1
+                                    rounded-full bg-indigo-500/30"></div>
+
+                        <div class="flex flex-col lg:flex-row gap-6">
+
+                            {{-- LOGO --}}
+                            <div class="flex-shrink-0 w-full lg:w-44">
+                                <div class="h-32 lg:h-28 rounded-xl overflow-hidden
+                                            bg-white p-4
+                                            ring-1 ring-gray-200
+                                            flex items-center justify-center">
+
+                                    <img src="{{ $imgPath }}"
+                                         alt="{{ $company->name }}"
+                                         class="w-full h-full object-cover
+                                                group-hover:scale-105 transition">
+                                </div>
                             </div>
 
-                            {{-- RIGHT: info --}}
-                            <div class="flex-1 w-full">
-                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                            {{-- CONTENT --}}
+                            <div class="flex-1 flex flex-col justify-between">
+
+                                {{-- TOP --}}
+                                <div class="flex flex-col md:flex-row md:justify-between gap-4">
                                     <div>
-                                        <h4 class="text-lg font-semibold text-gray-900 dark:text-white leading-tight">
+                                        <h4 class="text-xl font-bold text-gray-900 dark:text-white">
                                             {{ $company->name }}
                                         </h4>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        <p class="text-xs uppercase tracking-widest text-gray-400 mt-1">
                                             {{ $company->company_code }}
-                                        </div>
+                                        </p>
                                     </div>
 
-                                    <div class="text-right sm:text-right">
-                                        <div class="inline-flex items-center px-3 py-1 rounded-full bg-green-50 text-green-800 text-sm font-medium">
-                                            {{-- show open events count --}}
-                                            {{ $company->activities_count ?? 0 }} open {{ \Illuminate\Support\Str::plural('event', $company->activities_count ?? 0) }}
-                                        </div>
+                                    {{-- STATUS BADGES --}}
+                                    <div class="flex items-center gap-3">
+                                        <span class="inline-flex items-center gap-1.5
+                                                     px-4 py-1.5 rounded-full
+                                                     bg-emerald-50 text-emerald-700
+                                                     text-xs font-semibold
+                                                     border border-emerald-200">
+                                            ● {{ $company->ongoing_count ?? 0 }} Ongoing
+                                        </span>
+
+                                        <span class="inline-flex items-center gap-1.5
+                                                     px-4 py-1.5 rounded-full
+                                                     bg-amber-50 text-amber-700
+                                                     text-xs font-semibold
+                                                     border border-amber-200">
+                                            ● {{ $company->upcoming_count ?? 0 }} Upcoming
+                                        </span>
                                     </div>
                                 </div>
 
-                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-3 line-clamp-3">
+                                {{-- ADDRESS --}}
+                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-4 line-clamp-2">
                                     {{ $company->address ?? 'Address not provided.' }}
                                 </p>
 
-                                <div class="mt-4 flex items-center gap-3">
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        <strong class="text-gray-800 dark:text-gray-200">{{ $company->phone ?? '-' }}</strong>
+                                {{-- FOOTER --}}
+                                <div class="mt-5 flex flex-wrap items-center gap-4
+                                            text-sm text-gray-500 dark:text-gray-400">
+                                    <span class="flex items-center gap-2">
+                                        📞
+                                        <span class="font-medium text-gray-800 dark:text-gray-200">
+                                            {{ $company->phone ?? '-' }}
+                                        </span>
                                     </span>
 
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">•</span>
+                                    <span class="hidden sm:inline">•</span>
 
-                                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                                        {{ $company->email ?? '' }}
+                                    <span class="flex items-center gap-2">
+                                        ✉️ {{ $company->email ?? '-' }}
                                     </span>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </a>
+
             @empty
                 <p class="text-gray-500">No organizations found.</p>
             @endforelse
         </div>
 
-        {{-- Pagination --}}
-        <div class="mt-4">
+        {{-- PAGINATION --}}
+        <div class="mt-6">
             {{ $companies->links() }}
         </div>
+
     </div>
 </x-app-layout>

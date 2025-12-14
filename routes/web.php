@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ActivityController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ActivityRegistrationController;
 
 Route::get('/', function () {
     return redirect('/login');
@@ -39,6 +40,11 @@ Route::middleware('auth')->group(function () {
 
     // About page (static)
     Route::get('/about', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+
+    Route::post(
+        '/activities/{activity}/register',
+        [ActivityRegistrationController::class, 'store']
+    )->name('activities.register');
 
 
 });

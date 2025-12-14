@@ -1,245 +1,246 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Give 2 Grow') }}
+            Give2Grow
         </h2>
     </x-slot>
 
     @php
-        // helper: route_exists
-        if (! function_exists('route_exists')) {
-            function route_exists($name) {
-                try {
-                    return \Illuminate\Support\Facades\Route::has($name);
-                } catch (\Throwable $e) {
-                    return false;
-                }
-            }
+        $activities = \App\Models\Activity::latest('start_date')->take(6)->get();
+        $recentActivities = \App\Models\Activity::latest('start_date')->take(9)->get();
+
+        $activitiesCount = \App\Models\Activity::count();
+        $orgCount = \App\Models\Company::count();
+
+        function activity_image($a) {
+            if (!$a || empty($a->image_url)) return asset('images/default.jpg');
+            if (filter_var($a->image_url, FILTER_VALIDATE_URL)) return $a->image_url;
+            return asset($a->image_url);
         }
-
-        // helper: activity_image_url
-        if (! function_exists('activity_image_url')) {
-            function activity_image_url($activity) {
-                if (!$activity) return asset('images/default.jpg');
-
-                $img = $activity->image_url ?? null;
-                if (!$img) return asset('images/default.jpg');
-
-                // if image_url already full URL, return as-is
-                if (filter_var($img, FILTER_VALIDATE_URL)) return $img;
-
-                // else assume path under public (e.g. img/xxx.jpg)
-                return asset($img);
-            }
-        }
-
-        // safe counts
-        $activitiesCount = class_exists(\App\Models\Activity::class) ? \App\Models\Activity::count() : 0;
-        $orgCount = class_exists(\App\Models\Company::class) ? \App\Models\Company::count() : (class_exists(\App\Models\Organization::class) ? \App\Models\Organization::count() : 0);
-
-        // carousel items (up to 6) - prefer activities with image_url
-        $activitiesForCarousel = class_exists(\App\Models\Activity::class)
-            ? \App\Models\Activity::whereNotNull('image_url')->where('image_url', '!=', '')->latest('start_date')->take(6)->get()
-            : collect();
-
-        // If no activity images, fallback to any activities (to keep carousel indicators correct)
-        if ($activitiesForCarousel->isEmpty() && class_exists(\App\Models\Activity::class)) {
-            $activitiesForCarousel = \App\Models\Activity::latest('start_date')->take(6)->get();
-        }
-
-        // recent activities (6 latest)
-        $recentActivities = class_exists(\App\Models\Activity::class)
-            ? \App\Models\Activity::latest('start_date')->take(6)->get()
-            : collect();
     @endphp
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    <div class="py-12 space-y-28">
 
-            {{-- CAROUSEL --}}
-            @if($activitiesForCarousel->isNotEmpty())
-                <div id="default-carousel" class="relative w-full mb-8" data-carousel="slide">
-                    <div class="relative h-64 overflow-hidden rounded-lg md:h-96">
-                        @foreach ($activitiesForCarousel as $index => $activity)
-                            <div class="{{ $index === 0 ? '' : 'hidden' }} duration-700 ease-in-out" data-carousel-item>
-                                <img src="{{ activity_image_url($activity) }}"
-                                     alt="{{ $activity->title ?? 'Activity' }}"
-                                     loading="lazy"
-                                     class="absolute block w-full h-full object-cover top-0 left-0">
-                                <div class="absolute left-4 bottom-4 bg-black/50 text-white rounded px-3 py-2">
-                                    <span class="font-semibold">{{ \Illuminate\Support\Str::limit($activity->title ?? 'Untitled', 40) }}</span>
-                                    @if(!empty($activity->start_date))
-                                        <span class="text-xs ml-2">{{ \Carbon\Carbon::parse($activity->start_date)->format('d M Y') }}</span>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
+        {{-- ================= HERO CAROUSEL ================= --}}
+        <section>
+            <div class="relative overflow-hidden rounded-[2.5rem] shadow-2xl">
+                <div id="carouselInner" class="flex transition-transform duration-700">
+                    @foreach($activities as $a)
+                        <div class="min-w-full relative">
+                            <img src="{{ activity_image($a) }}"
+                                 class="w-full h-[520px] object-cover">
 
-                    {{-- indicators --}}
-                    <div class="absolute z-30 flex -translate-x-1/2 bottom-5 left-1/2 space-x-3">
-                        @foreach ($activitiesForCarousel as $i => $it)
-                            <button type="button"
-                                    class="w-3 h-3 rounded-full bg-white/60"
-                                    aria-label="Slide {{ $i+1 }}"
-                                    data-carousel-slide-to="{{ $i }}"></button>
-                        @endforeach
-                    </div>
+                            {{-- layered overlay --}}
+                            <div class="absolute inset-0
+                                        bg-gradient-to-r
+                                        from-indigo-900/60
+                                        via-purple-900/30
+                                        to-transparent"></div>
 
-                    {{-- prev/next --}}
-                    <button type="button" class="absolute top-0 start-0 z-30 flex items-center justify-center h-full px-4" data-carousel-prev>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                            </svg>
-                        </span>
-                    </button>
+                            {{-- TEXT --}}
+                            <div class="absolute bottom-16 left-16 text-white max-w-xl">
+                                <span class="inline-block mb-4 px-4 py-1
+                                             bg-gradient-to-r from-indigo-500 to-purple-500
+                                             rounded-full text-xs font-semibold shadow">
+                                    {{ $a->category ?? 'Activity' }}
+                                </span>
 
-                    <button type="button" class="absolute top-0 end-0 z-30 flex items-center justify-center h-full px-4" data-carousel-next>
-                        <span class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                            </svg>
-                        </span>
-                    </button>
-                </div>
-            @else
-                {{-- fallback banner --}}
-                <div class="relative w-full mb-8">
-                    <div class="relative h-64 overflow-hidden rounded-lg md:h-96">
-                        <img src="{{ asset('images/default-carousel.jpg') }}" alt="No featured activities" class="absolute block w-full h-full object-cover top-0 left-0">
-                        <div class="absolute left-4 bottom-4 bg-black/50 text-white rounded px-3 py-2">
-                            <span class="font-semibold">No featured activities yet</span>
-                            <div class="text-xs">Add activities with images to show here.</div>
-                        </div>
-                    </div>
-                </div>
-            @endif
+                                <h3 class="text-5xl font-black mb-4 leading-tight drop-shadow-xl">
+                                    {{ $a->title }}
+                                </h3>
 
-            {{-- THREE MAIN CARDS --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <!-- Find Activities -->
-                <a href="{{ route_exists('activities.index') ? route('activities.index') : url('/activities') }}" class="block group">
-                    <div class="bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition p-6 rounded-lg h-full flex flex-col justify-between">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6a2 2 0 012-2h6M9 17H5a2 2 0 01-2-2V7a2 2 0 012-2h14"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Find Activities</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-300">Browse volunteer activities near you or online.</p>
-                                </div>
-                            </div>
+                                <p class="mb-8 text-lg opacity-95 drop-shadow">
+                                    {{ \Illuminate\Support\Str::limit($a->description, 120) }}
+                                </p>
 
-                            <div class="text-sm">
-                                <span class="inline-flex items-center px-2 py-1 rounded bg-green-50 text-green-700 text-xs font-semibold">{{ $activitiesCount }} open</span>
+                                <a href="{{ route('activities.show', $a->id) }}"
+                                   class="inline-flex items-center px-9 py-4
+                                          bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600
+                                          text-white font-bold rounded-2xl shadow-2xl
+                                          hover:scale-105 transition">
+                                    View Activity →
+                                </a>
                             </div>
                         </div>
-
-                        <div class="mt-6">
-                            <span class="inline-flex items-center text-sm px-3 py-2 rounded bg-green-600 text-white group-hover:bg-green-700">
-                                Browse Activities
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Find Organizations -->
-                <a href="{{ route_exists('organizations.index') ? route('organizations.index') : url('/organizations') }}" class="block group">
-                    <div class="bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition p-6 rounded-lg h-full flex flex-col justify-between">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 10-8 0v4M4 20h16v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2z"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Find Organizations</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-300">Explore organizations and see the activities they run.</p>
-                                </div>
-                            </div>
-
-                            <div class="text-sm">
-                                <span class="inline-flex items-center px-2 py-1 rounded bg-indigo-50 text-indigo-700 text-xs font-semibold">{{ $orgCount }} orgs</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-6">
-                            <span class="inline-flex items-center text-sm px-3 py-2 rounded bg-indigo-600 text-white group-hover:bg-indigo-700">
-                                Browse Organizations
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-
-                <!-- Donation -->
-                <a href="{{ route_exists('donations.index') ? route('donations.index') : url('/donations') }}" class="block group">
-                    <div class="bg-white dark:bg-gray-800 shadow-sm hover:shadow-lg transition p-6 rounded-lg h-full flex flex-col justify-between">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c1.657 0 3-1.343 3-3S13.657 2 12 2 9 3.343 9 5s1.343 3 3 3zM6 21h12"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Donation</h3>
-                                    <p class="text-sm text-gray-500 dark:text-gray-300">Support organizations and activities with donations.</p>
-                                </div>
-                            </div>
-
-                            <div class="text-sm">
-                                <span class="inline-flex items-center px-2 py-1 rounded bg-yellow-50 text-yellow-700 text-xs font-semibold">Support now</span>
-                            </div>
-                        </div>
-
-                        <div class="mt-6">
-                            <span class="inline-flex items-center text-sm px-3 py-2 rounded bg-yellow-600 text-white group-hover:bg-yellow-700">
-                                Donate
-                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                </svg>
-                            </span>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            {{-- RECENT ACTIVITIES --}}
-            <div class="mt-6">
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Recent Activities</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    @if($recentActivities->isNotEmpty())
-                        @foreach($recentActivities as $a)
-                            <a href="{{ route_exists('activities.show') ? route('activities.show', $a->id) : url('/activities/'.$a->id) }}" class="block group">
-                                <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm hover:shadow-md transition">
-                                    <div class="flex gap-4">
-                                        <img src="{{ activity_image_url($a) }}" class="w-20 h-20 object-cover rounded" alt="{{ $a->title ?? 'Activity' }}" loading="lazy">
-                                        <div>
-                                            <h4 class="font-semibold text-gray-900 dark:text-white">{{ $a->title }}</h4>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">{{ \Illuminate\Support\Str::limit($a->description, 60) }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    @else
-                        <p class="text-gray-500">No activities found.</p>
-                    @endif
+                    @endforeach
                 </div>
             </div>
+        </section>
 
-        </div>
+        {{-- ================= QUICK STATS ================= --}}
+        <section class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                {{-- Activities --}}
+                <div class="relative p-9 rounded-3xl
+                            bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600
+                            text-white shadow-2xl overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-white/20 text-[120px]">🤝</div>
+                    <p class="uppercase tracking-widest text-sm opacity-80">Activities</p>
+                    <h3 class="text-5xl font-black my-2">{{ $activitiesCount }}</h3>
+                    <p class="text-lg">Volunteer Programs</p>
+                </div>
+
+                {{-- Organizations --}}
+                <div class="relative p-9 rounded-3xl
+                            bg-gradient-to-br from-emerald-500 via-teal-500 to-green-500
+                            text-white shadow-2xl overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-white/20 text-[120px]">🏢</div>
+                    <p class="uppercase tracking-widest text-sm opacity-80">Partners</p>
+                    <h3 class="text-5xl font-black my-2">{{ $orgCount }}</h3>
+                    <p class="text-lg">Organizations</p>
+                </div>
+
+                {{-- Impact --}}
+                <div class="relative p-9 rounded-3xl
+                            bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-500
+                            text-gray-900 shadow-2xl overflow-hidden">
+                    <div class="absolute -top-10 -right-10 text-black/20 text-[120px]">🌍</div>
+                    <p class="uppercase tracking-widest text-sm opacity-80">Impact</p>
+                    <h3 class="text-5xl font-black my-2">100%</h3>
+                    <p class="text-lg">Positive Change</p>
+                </div>
+
+            </div>
+        </section>
+
+        {{-- ================= MAIN ACTION CARDS ================= --}}
+        <section class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+                {{-- Activities --}}
+                <a href="{{ route('activities.index') }}" class="group">
+                    <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
+                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-full
+                                    bg-indigo-100 text-indigo-600
+                                    flex items-center justify-center mb-6">
+                            🔍
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Find Activities</h3>
+                        <p class="text-gray-500 mb-4">
+                            Discover opportunities that match your passion.
+                        </p>
+                        <span class="inline-block text-sm px-3 py-1 rounded
+                                     bg-indigo-50 text-indigo-700">
+                            {{ $activitiesCount }} activities
+                        </span>
+                    </div>
+                </a>
+
+                {{-- Organizations --}}
+                <a href="{{ route('organizations.index') }}" class="group">
+                    <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
+                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-full
+                                    bg-emerald-100 text-emerald-600
+                                    flex items-center justify-center mb-6">
+                            🏢
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Find Organizations</h3>
+                        <p class="text-gray-500 mb-4">
+                            Explore trusted partners making impact.
+                        </p>
+                        <span class="inline-block text-sm px-3 py-1 rounded
+                                     bg-emerald-50 text-emerald-700">
+                            {{ $orgCount }} organizations
+                        </span>
+                    </div>
+                </a>
+
+                {{-- Donations --}}
+                <a href="{{ url('/donations') }}" class="group">
+                    <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
+                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                        <div class="w-14 h-14 rounded-full
+                                    bg-amber-100 text-amber-600
+                                    flex items-center justify-center mb-6">
+                            💛
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Donations</h3>
+                        <p class="text-gray-500 mb-4">
+                            Support causes through transparent giving.
+                        </p>
+                        <span class="inline-block text-sm px-3 py-1 rounded
+                                     bg-amber-50 text-amber-700">
+                            Support now
+                        </span>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        {{-- ================= LATEST ACTIVITIES ================= --}}
+        <section>
+            <h3 class="text-3xl font-extrabold mb-10">Latest Activities</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                @foreach($recentActivities as $a)
+                    <a href="{{ route('activities.show', $a->id) }}"
+                       class="group bg-white dark:bg-gray-800 rounded-2xl
+                              shadow hover:-translate-y-1 hover:shadow-2xl transition">
+                        <img src="{{ activity_image($a) }}"
+                             class="w-full h-48 object-cover rounded-t-2xl">
+
+                        <div class="p-5 space-y-2">
+                            <span class="inline-block text-xs px-3 py-1
+                                         bg-gradient-to-r from-indigo-500 via-purple-500 to-blue-500
+                                         text-white rounded-full">
+                                {{ $a->category }}
+                            </span>
+
+                            <h4 class="font-bold text-lg">
+                                {{ $a->title }}
+                            </h4>
+
+                            <p class="text-sm text-gray-500">
+                                🏢 {{ $companies[$a->company_code] ?? $a->organizer ?? 'Organization' }}
+                            </p>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+
+        {{-- ================= BIG CTA ================= --}}
+        <section class="bg-gradient-to-br from-indigo-700 via-purple-700 to-blue-700 py-32">
+            <div class="max-w-4xl mx-auto text-center text-white px-4">
+                <h3 class="text-5xl font-black mb-6 drop-shadow-xl">
+                    Ready to Grow Together?
+                </h3>
+                <p class="opacity-90 text-xl mb-12">
+                    Join volunteers creating meaningful change.
+                </p>
+
+                <div class="flex justify-center gap-6 flex-wrap">
+                    <a href="{{ route('activities.index') }}"
+                       class="px-10 py-4 bg-white text-indigo-700
+                              rounded-2xl font-bold shadow-xl
+                              hover:scale-105 transition">
+                        Find Activities
+                    </a>
+                    <a href="{{ route('organizations.index') }}"
+                       class="px-10 py-4 border-2 border-white
+                              rounded-2xl font-bold
+                              hover:bg-white hover:text-indigo-700 transition">
+                        Explore Organizations
+                    </a>
+                </div>
+            </div>
+        </section>
+
     </div>
+
+    {{-- AUTO SLIDE --}}
+    <script>
+        const inner = document.getElementById('carouselInner');
+        let index = 0;
+        const total = inner.children.length;
+
+        setInterval(() => {
+            index = (index + 1) % total;
+            inner.style.transform = `translateX(-${index * 100}%)`;
+        }, 4500);
+    </script>
 </x-app-layout>
