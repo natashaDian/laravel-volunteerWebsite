@@ -13,9 +13,18 @@ return new class extends Migration
     {
         Schema::create('activity_registrations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('activity_id')->constrained('activities')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('activity_id')->constrained()->cascadeOnDelete();
+
+            $table->enum('status', ['pending', 'approved', 'rejected', 'confirmed'])->default('pending');
+
+            $table->string('motivation')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('confirmation_code')->nullable();
+
             $table->timestamps();
+
+            $table->unique(['user_id', 'activity_id']); // prevent double register
         });
 
     }

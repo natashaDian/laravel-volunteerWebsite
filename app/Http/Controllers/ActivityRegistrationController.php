@@ -5,29 +5,56 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Activity;
 use App\Models\ActivityRegistration;
+use Illuminate\Support\Facades\Auth;
 
 class ActivityRegistrationController extends Controller
 {
     public function store(Request $request, Activity $activity)
     {
-        $user = $request->user();
-        if (! $user) {
-            return redirect()->route('login');
-        }
+        $request->validate([
+            'motivation' => 'nullable|string|max:500',
+            'phone' => 'nullable|string|max:20',
+        ]);
 
-        $exists = ActivityRegistration::where('activity_id', $activity->id)
-            ->where('user_id', $user->id)
+        $alreadyRegistered = ActivityRegistration::where('user_id', Auth::id())
+            ->where('activity_id', $activity->id)
             ->exists();
 
-        if ($exists) {
-            return redirect()->back()->with('error', 'You are already registered for this activity.');
+        if ($alreadyRegistered) {
+            return back()->with('error', 'You have already registered for this activity.');
         }
 
         ActivityRegistration::create([
+            'user_id'     => Auth::id(),
             'activity_id' => $activity->id,
-            'user_id' => $user->id,
+            'motivation'  => $request->motivation,
+            'phone'       => $request->phone,
+            'status'      => 'pending',
         ]);
 
-        return redirect()->route('activities.show', $activity)->with('success', 'Registration successful.');
+        return back()->with('success', 'Registration submitted successfully. Please wait for approval. You may be contacted by the organization.');
     }
+
+    public function confirm(Request $request, Activity $activity)
+    {
+        $request->validate([
+            'confirmation_code' => 'required|string',
+        ]);
+
+        $registration = ActivityRegistration::where('user_id', Auth::id())
+            ->where('activity_id', $activity->id)
+            ->where('status', 'approved')
+            ->firstOrFail();
+
+        if ($request->confirmation_code !== $registration->confirmation_code) {
+            return back()->with('error', 'Invalid participation code.');
+        }
+
+        $registration->update([
+            'status' => 'confirmed',
+        ]);
+
+        return back()->with('success', 'Participation confirmed successfully.');
+    }
+
 }

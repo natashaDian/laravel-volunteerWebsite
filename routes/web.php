@@ -65,6 +65,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/activities/{activity}/register', [ActivityRegistrationController::class, 'store'])
         ->name('activities.register');
 
+    Route::post('/activities/{activity}/confirm', [ActivityRegistrationController::class, 'confirm'])
+        ->name('activities.confirm');
+
+
     /*
     | Organizations
     */
