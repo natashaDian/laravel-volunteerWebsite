@@ -1,52 +1,126 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
+// ================= USER CONTROLLERS =================
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\ActivityController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActivityRegistrationController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\OrganizationController;
 
+// ================= COMPANY CONTROLLERS =================
+use App\Http\Controllers\CompanyDashboardController;
+use App\Http\Controllers\CompanyActivityController;
+
+/*
+|--------------------------------------------------------------------------
+| Landing
+|--------------------------------------------------------------------------
+*/
 Route::get('/', function () {
     return redirect('/login');
 });
 
+/*
+|--------------------------------------------------------------------------
+| USER DASHBOARD
+|--------------------------------------------------------------------------
+*/
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Group route yang butuh auth — lebih rapi bila digabung
+/*
+|--------------------------------------------------------------------------
+| AUTHENTICATED USER ROUTES
+|--------------------------------------------------------------------------
+*/
 Route::middleware('auth')->group(function () {
-    // profile
+
+    /*
+    | Profile
+    */
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // events
-    Route::get('/events/{id}', [EventController::class, 'eventDetail'])->name('events.show');
+    /*
+    | Events (legacy)
+    */
+    Route::get('/events/{id}', [EventController::class, 'eventDetail'])
+        ->name('events.show');
 
-    // activities
-    // 1) index menerima query string untuk filter/sort/search (contoh: /activities?filter=seni&sort=latest&q=kata)
-    Route::get('/activities', [ActivityController::class, 'index'])->name('activities.index');
+    /*
+    | Activities (USER SIDE)
+    */
+    Route::get('/activities', [ActivityController::class, 'index'])
+        ->name('activities.index');
 
-    // 2) detail (pakai route model binding lebih aman) — pastikan controller show(Activity $activity)
-    Route::get('/activities/{activity}', [ActivityController::class, 'show'])->name('activities.show');
+    Route::get('/activities/{activity}', [ActivityController::class, 'show'])
+        ->name('activities.show');
 
-    // Organizations (index + show)
-    Route::get('/organizations', [\App\Http\Controllers\OrganizationController::class, 'index'])->name('organizations.index');
-    Route::get('/organizations/{company}', [\App\Http\Controllers\OrganizationController::class, 'show'])->name('organizations.show');
+    Route::post('/activities/{activity}/register', [ActivityRegistrationController::class, 'store'])
+        ->name('activities.register');
 
-    // Donations page (list / info)
-    Route::get('/donations', [\App\Http\Controllers\DonationController::class, 'index'])->name('donations.index');
+    /*
+    | Organizations
+    */
+    Route::get('/organizations', [OrganizationController::class, 'index'])
+        ->name('organizations.index');
 
-    // About page (static)
-    Route::get('/about', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+    Route::get('/organizations/{company}', [OrganizationController::class, 'show'])
+        ->name('organizations.show');
 
-    Route::post(
-        '/activities/{activity}/register',
-        [ActivityRegistrationController::class, 'store']
-    )->name('activities.register');
+    /*
+    | Donations
+    */
+    Route::get('/donations', [DonationController::class, 'index'])
+        ->name('donations.index');
 
+    Route::get('/donations/method', [DonationController::class, 'method'])
+        ->name('donations.method');
 
+    Route::get('/donations/checkout', [DonationController::class, 'checkout'])
+        ->name('donations.checkout');
+
+    Route::post('/donations/confirm', [DonationController::class, 'confirm'])
+        ->name('donations.confirm');
+
+    /*
+    | About
+    */
+    Route::get('/about', [AboutController::class, 'index'])
+        ->name('about');
 });
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| COMPANY ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth:company')
+    ->prefix('company')
+    ->name('company.')
+    ->group(function () {
+
+        /*
+        | Company Dashboard
+        */
+        Route::get('/dashboard', [CompanyDashboardController::class, 'index'])
+            ->name('dashboard');
+
+        /*
+        | Company Activities (CRUD)
+        */
+        Route::resource('activities', CompanyActivityController::class);
+    });
+
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES
+|--------------------------------------------------------------------------
+*/
+require __DIR__ . '/auth.php';

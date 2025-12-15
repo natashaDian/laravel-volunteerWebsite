@@ -6,26 +6,7 @@
     </x-slot>
 
     @php
-        $today = now()->startOfDay();
-
-        // pastikan ada
         $companies = $companies ?? [];
-
-        $ongoing = $activities->filter(fn($a) =>
-            $a->start_date &&
-            \Carbon\Carbon::parse($a->start_date)->lte($today) &&
-            (!$a->end_date || \Carbon\Carbon::parse($a->end_date)->gte($today))
-        );
-
-        $upcoming = $activities->filter(fn($a) =>
-            $a->start_date &&
-            \Carbon\Carbon::parse($a->start_date)->gt($today)
-        );
-
-        $ended = $activities->filter(fn($a) =>
-            $a->end_date &&
-            \Carbon\Carbon::parse($a->end_date)->lt($today)
-        );
 
         $categoryColors = [
             'seni dan budaya' => 'bg-indigo-100 text-indigo-800',
@@ -46,20 +27,18 @@
 
     {{-- ================= FILTER BAR ================= --}}
     <form method="GET" action="{{ route('activities.index') }}"
-        class="max-w-7xl mx-auto px-4 pt-6">
+          class="max-w-7xl mx-auto px-4 pt-6">
 
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4
                     grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 
-            {{-- Search --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Keyword</label>
                 <input type="text" name="q" value="{{ request('q') }}"
-                    placeholder="Search title / description"
-                    class="w-full mt-1 rounded border-gray-300">
+                       class="w-full mt-1 rounded border-gray-300"
+                       placeholder="Search title / description">
             </div>
 
-            {{-- Category --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Category</label>
                 <select name="category" class="w-full mt-1 rounded border-gray-300">
@@ -72,7 +51,6 @@
                 </select>
             </div>
 
-            {{-- Organization --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Organization</label>
                 <select name="company" class="w-full mt-1 rounded border-gray-300">
@@ -85,192 +63,177 @@
                 </select>
             </div>
 
-            {{-- Date --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Start After</label>
                 <input type="date" name="start_date" value="{{ request('start_date') }}"
-                    class="w-full mt-1 rounded border-gray-300">
+                       class="w-full mt-1 rounded border-gray-300">
             </div>
 
-            {{-- Buttons --}}
             <div class="flex gap-2">
                 <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
                     Apply
                 </button>
                 <a href="{{ route('activities.index') }}"
-                class="px-4 py-2 border rounded-lg text-gray-600">
+                   class="px-4 py-2 border rounded-lg text-gray-600">
                     Reset
                 </a>
             </div>
         </div>
     </form>
 
-
     <div class="max-w-7xl mx-auto py-10 px-4 space-y-14">
 
         {{-- ================= ONGOING ================= --}}
         @if($ongoing->count())
-            <section>
-                <h3 class="text-2xl font-bold mb-5">🔥 Ongoing Activities</h3>
+        <section>
+            <h3 class="text-2xl font-bold mb-5">🔥 Ongoing Activities</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach($ongoing as $a)
+                    @php
+                        $catKey = strtolower($a->category ?? '');
+                        $catColor = $categoryColors[$catKey] ?? 'bg-gray-100 text-gray-800';
+                        $companyName = $companies[$a->company_code] ?? 'Organization';
+                    @endphp
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @foreach($ongoing as $a)
-                        @php
-                            $catKey = strtolower($a->category ?? '');
-                            $catColor = $categoryColors[$catKey] ?? 'bg-gray-100 text-gray-800';
-                            $companyName = $companies[$a->company_code] ?? 'Organization';
-                        @endphp
+                    <a href="{{ route('activities.show', $a->id) }}">
+                        <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
+                                    hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
+                                    border border-transparent hover:border-green-300 h-full flex flex-col">
 
-                        <a href="{{ route('activities.show', $a->id) }}">
-                            <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
-                                        hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
-                                        border border-transparent hover:border-green-300 h-full flex flex-col">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="{{ img($a) }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition">
 
-                                {{-- IMAGE --}}
-                                <div class="relative h-48 overflow-hidden">
-                                    <img src="{{ img($a) }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition">
+                                <div class="absolute top-2 left-2 flex gap-1">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                        Ongoing
+                                    </span>
 
-                                    {{-- STATUS --}}
-                                    <div class="absolute top-2 left-2 flex gap-1">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                                            Ongoing
+                                    @if($a->category)
+                                        <span class="px-2 py-1 text-xs rounded {{ $catColor }}">
+                                            {{ $a->category }}
                                         </span>
-
-                                        @if($a->category)
-                                            <span class="px-2 py-1 text-xs rounded {{ $catColor }}">
-                                                {{ $a->category }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                {{-- CONTENT --}}
-                                <div class="p-4 flex flex-col flex-1">
-                                    <h4 class="font-semibold text-gray-900 dark:text-white leading-snug">
-                                        {{ $a->title }}
-                                    </h4>
-
-                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 line-clamp-3">
-                                        {{ $a->description }}
-                                    </p>
-
-                                    {{-- ORGANIZATION --}}
-                                    <p class="text-sm text-gray-700 dark:text-gray-300 mt-3">
-                                        🏢 {{ $companyName }}
-                                    </p>
-
-                                    {{-- FOOTER --}}
-                                    <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
-                                        📍 {{ $a->location ?? 'Virtual' }} <br>
-                                        📅 {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
-                        </a>
-                    @endforeach
-                </div>
-            </section>
+
+                            <div class="p-4 flex flex-col flex-1">
+                                <h4 class="font-semibold text-gray-900 dark:text-white">
+                                    {{ $a->title }}
+                                </h4>
+
+                                <p class="text-sm text-gray-500 mt-2 line-clamp-3">
+                                    {{ $a->description }}
+                                </p>
+
+                                <p class="text-sm text-gray-700 mt-3">
+                                    🏢 {{ $companyName }}
+                                </p>
+
+                                <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
+                                    📅 {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
         @endif
 
         {{-- ================= UPCOMING ================= --}}
         @if($upcoming->count())
-            <section>
-                <h3 class="text-2xl font-bold mb-5">⏳ Upcoming Activities</h3>
+        <section>
+            <h3 class="text-2xl font-bold mb-5">⏳ Upcoming Activities</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                @foreach($upcoming as $a)
+                    @php
+                        $catKey = strtolower($a->category ?? '');
+                        $catColor = $categoryColors[$catKey] ?? 'bg-gray-100 text-gray-800';
+                        $companyName = $companies[$a->company_code] ?? 'Organization';
+                    @endphp
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    @foreach($upcoming as $a)
-                        @php
-                            $catKey = strtolower($a->category ?? '');
-                            $catColor = $categoryColors[$catKey] ?? 'bg-gray-100 text-gray-800';
-                            $companyName = $companies[$a->company_code] ?? 'Organization';
-                        @endphp
+                    <a href="{{ route('activities.show', $a->id) }}">
+                        <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
+                                    hover:shadow-xl hover:-translate-y-1 transition
+                                    border border-transparent hover:border-yellow-300 h-full flex flex-col">
 
-                        <a href="{{ route('activities.show', $a->id) }}">
-                            <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
-                                        hover:shadow-xl hover:-translate-y-1 transition
-                                        border border-transparent hover:border-yellow-300 h-full flex flex-col">
+                            <div class="relative h-48 overflow-hidden">
+                                <img src="{{ img($a) }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition">
 
-                                <div class="relative h-48 overflow-hidden">
-                                    <img src="{{ img($a) }}"
-                                         class="w-full h-full object-cover group-hover:scale-105 transition">
+                                <div class="absolute top-2 left-2 flex gap-1">
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        Upcoming
+                                    </span>
 
-                                    <div class="absolute top-2 left-2 flex gap-1">
-                                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                                            Upcoming
+                                    @if($a->category)
+                                        <span class="px-2 py-1 text-xs rounded {{ $catColor }}">
+                                            {{ $a->category }}
                                         </span>
-
-                                        @if($a->category)
-                                            <span class="px-2 py-1 text-xs rounded {{ $catColor }}">
-                                                {{ $a->category }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <div class="p-4 flex flex-col flex-1">
-                                    <h4 class="font-semibold text-gray-900 dark:text-white">
-                                        {{ $a->title }}
-                                    </h4>
-
-                                    <p class="text-sm text-gray-500 mt-2 line-clamp-3">
-                                        {{ $a->description }}
-                                    </p>
-
-                                    <p class="text-sm text-gray-700 mt-3">
-                                        🏢 {{ $companyName }}
-                                    </p>
-
-                                    <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
-                                        🕒 Starts {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
-                                    </div>
+                                    @endif
                                 </div>
                             </div>
-                        </a>
-                    @endforeach
-                </div>
-            </section>
+
+                            <div class="p-4 flex flex-col flex-1">
+                                <h4 class="font-semibold text-gray-900 dark:text-white">
+                                    {{ $a->title }}
+                                </h4>
+
+                                <p class="text-sm text-gray-500 mt-2 line-clamp-3">
+                                    {{ $a->description }}
+                                </p>
+
+                                <p class="text-sm text-gray-700 mt-3">
+                                    🏢 {{ $companyName }}
+                                </p>
+
+                                <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
+                                    🕒 Starts {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
         @endif
 
-        {{-- ================= ENDED ================= --}}
+        {{-- ================= PAST ================= --}}
         @if($ended->count())
-            <section>
-                <h3 class="text-2xl font-bold mb-5">❌ Past Activities</h3>
+        <section>
+            <h3 class="text-2xl font-bold mb-5">❌ Past Activities</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 opacity-70">
+                @foreach($ended as $a)
+                    @php
+                        $companyName = $companies[$a->company_code] ?? 'Organization';
+                    @endphp
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 opacity-70">
-                    @foreach($ended as $a)
-                        @php
-                            $companyName = $companies[$a->company_code] ?? 'Organization';
-                        @endphp
+                    <a href="{{ route('activities.show', $a->id) }}">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow border h-full flex flex-col">
+                            <div class="h-48 grayscale">
+                                <img src="{{ img($a) }}" class="w-full h-full object-cover">
+                            </div>
 
-                        <a href="{{ route('activities.show', $a->id) }}">
-                            <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow border h-full flex flex-col">
-                                <div class="h-48 grayscale">
-                                    <img src="{{ img($a) }}" class="w-full h-full object-cover">
-                                </div>
+                            <div class="p-4 flex flex-col flex-1">
+                                <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+                                    {{ $a->title }}
+                                </h4>
 
-                                <div class="p-4 flex flex-col flex-1">
-                                    <h4 class="font-semibold text-gray-700 dark:text-gray-300">
-                                        {{ $a->title }}
-                                    </h4>
+                                <p class="text-sm text-gray-600 mt-2">
+                                    🏢 {{ $companyName }}
+                                </p>
 
-                                    <p class="text-sm text-gray-600 mt-2">
-                                        🏢 {{ $companyName }}
-                                    </p>
-
-                                    <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
-                                        Ended on {{ \Carbon\Carbon::parse($a->end_date)->format('d M Y') }}
-                                    </div>
+                                <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
+                                    Ended on {{ \Carbon\Carbon::parse($a->end_date)->format('d M Y') }}
                                 </div>
                             </div>
-                        </a>
-                    @endforeach
-                </div>
-            </section>
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
         @endif
 
-        <div class="pt-6">
-            {{ $activities->links() }}
-        </div>
     </div>
 </x-app-layout>

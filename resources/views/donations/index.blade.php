@@ -1,27 +1,38 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Donations</h2>
+        <h2 class="font-semibold text-xl">Donations</h2>
     </x-slot>
 
-    <div class="max-w-4xl mx-auto py-8 px-4">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded shadow">
-            <h3 class="text-lg font-semibold mb-4">Support Give2Grow</h3>
-            <p class="text-gray-600 dark:text-gray-300 mb-4">
-                Thank you for supporting Give2Grow. Choose a method below to donate.
+    <div class="max-w-5xl mx-auto py-12 px-4">
+
+        {{-- HERO --}}
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-bold text-indigo-600 mb-3">
+                Support Give2Grow 💜💙
+            </h1>
+            <p class="text-slate-600 max-w-2xl mx-auto">
+                Your contribution helps communities grow through meaningful activities.
             </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($methods as $m)
-                    <div class="border rounded-lg p-4">
-                        <div class="font-semibold">{{ $m['name'] }}</div>
-                        <div class="text-sm text-gray-600 mt-1">{{ $m['detail'] }}</div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-6 text-sm text-gray-500">
-                Want to integrate online payments? Let me know and I can add a Stripe/PayPal integration example.
-            </div>
         </div>
+
+        {{-- DONATION METHODS --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+            @foreach($methods as $m)
+                <div class="bg-white p-6 rounded-2xl shadow border">
+                    <h3 class="text-lg font-semibold mb-1">{{ $m['name'] }}</h3>
+                    <p class="text-sm text-slate-600 mb-6">{{ $m['detail'] }}</p>
+
+                    {{-- 🔥 BUTTON FIX --}}
+                    <a href="{{ route('donations.method', ['method' => $m['name']]) }}"
+                    class="block text-center py-2.5 rounded-xl bg-indigo-600 text-white font-medium hover:bg-indigo-700">
+                        Donate via {{ $m['name'] }}
+                    </a>
+
+                </div>
+            @endforeach
+        </div>
+        
+        </div>
+
     </div>
 </x-app-layout>

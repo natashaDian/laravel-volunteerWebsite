@@ -6,18 +6,44 @@ use Illuminate\Http\Request;
 
 class DonationController extends Controller
 {
-    /**
-     * Show donation options / info.
-     */
     public function index()
     {
-        // you can later add payment integration or donation methods here
         $methods = [
-            ['name' => 'Bank Transfer', 'detail' => 'Bank ABC - 1234567890 (Give2Grow)'],
-            ['name' => 'GoPay / Ovo', 'detail' => 'Scan QR on request'],
-            ['name' => 'Direct Donation', 'detail' => 'Contact events organizer for details'],
+            ['name' => 'Bank Transfer', 'detail' => 'BCA, BNI, Mandiri'],
+            ['name' => 'E-Wallet', 'detail' => 'OVO, GoPay, DANA'],
+            ['name' => 'Virtual Account', 'detail' => 'Automatic transfer'],
         ];
 
         return view('donations.index', compact('methods'));
+    }
+
+    public function method(Request $request)
+    {
+        if (!$request->method) {
+            abort(404);
+        }
+
+        return view('donations.method', [
+            'method' => $request->method
+        ]);
+    }
+
+    public function checkout(Request $request)
+    {
+        if (!$request->method || !$request->amount) {
+            abort(404);
+        }
+
+        return view('donations.checkout', [
+            'amount' => $request->amount
+        ]);
+    }
+
+    public function confirm(Request $request)
+    {
+        return view('donations.success', [
+            'method' => $request->method,
+            'amount' => $request->amount
+        ]);
     }
 }

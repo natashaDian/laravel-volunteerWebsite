@@ -14,76 +14,70 @@ class ActivityController extends Controller
      */
     public function index(Request $request)
     {
-        // ambil map company_code => name
+        $today = now()->startOfDay();
+
+        // map company_code => name
         $companies = Company::pluck('name', 'company_code')->toArray();
 
-        // base query
-        $query = Activity::query();
+        // ================= BASE FILTER =================
+        $baseQuery = Activity::query();
 
-        // keyword search (title, description, organizer)
         if ($q = $request->query('q')) {
-            $query->where(function($sub) use ($q) {
-                $sub->where('title', 'like', '%'.$q.'%')
-                    ->orWhere('description', 'like', '%'.$q.'%')
-                    ->orWhere('organizer', 'like', '%'.$q.'%');
+            $baseQuery->where(function ($sub) use ($q) {
+                $sub->where('title', 'like', "%$q%")
+                    ->orWhere('description', 'like', "%$q%")
+                    ->orWhere('organizer', 'like', "%$q%");
             });
         }
 
-        // category exact match
         if ($cat = $request->query('category')) {
-            $query->where('category', $cat);
+            $baseQuery->where('category', $cat);
         }
 
-        // location contains
         if ($loc = $request->query('location')) {
-            $query->where('location', 'like', '%'.$loc.'%');
+            $baseQuery->where('location', 'like', "%$loc%");
         }
 
-        // company filter: accept company_code or company name
         if ($comp = $request->query('company')) {
-            $query->where(function($sub) use ($comp, $companies) {
-                // match company_code directly
-                $sub->where('company_code', $comp);
-
-                // if the provided value matches a company name (case-insensitive),
-                // also allow the corresponding company_code
-                foreach ($companies as $code => $name) {
-                    if (Str::lower($name) === Str::lower($comp)) {
-                        $sub->orWhere('company_code', $code);
-                    }
-                }
-            });
+            $baseQuery->where('company_code', $comp);
         }
 
-        // date range
         if ($start = $request->query('start_date')) {
-            $query->whereDate('start_date', '>=', $start);
+            $baseQuery->whereDate('start_date', '>=', $start);
         }
+
         if ($end = $request->query('end_date')) {
-            $query->whereDate('end_date', '<=', $end);
+            $baseQuery->whereDate('end_date', '<=', $end);
         }
 
-        // optional: sorting
-        if ($request->query('sort') === 'newest') {
-            $query->latest('start_date');
-        } else {
-            $query->latest('start_date');
-        }
+        // ================= STATUS SPLIT =================
+        $ongoing = (clone $baseQuery)
+            ->whereDate('start_date', '<=', $today)
+            ->where(function ($q) use ($today) {
+                $q->whereNull('end_date')
+                ->orWhereDate('end_date', '>=', $today);
+            })
+            ->orderBy('start_date')
+            ->get();
 
-        // paginate and keep query string for pagination links
-        $activities = $query->paginate(12)->withQueryString();
+        $upcoming = (clone $baseQuery)
+            ->whereDate('start_date', '>', $today)
+            ->orderBy('start_date')
+            ->get();
 
-        // categories list for filter dropdown
-        $categories = Activity::select('category')
-            ->whereNotNull('category')
-            ->distinct()
-            ->pluck('category')
-            ->filter()
-            ->values()
-            ->toArray();
+        $ended = (clone $baseQuery)
+            ->whereDate('end_date', '<', $today)
+            ->orderByDesc('end_date')
+            ->get();
 
-        return view('activities.index', compact('activities', 'companies', 'categories'));
+        return view('activities.index', compact(
+            'ongoing',
+            'upcoming',
+            'ended',
+            'companies'
+        ));
     }
+
 
     /**
      * Display the specified activity.
