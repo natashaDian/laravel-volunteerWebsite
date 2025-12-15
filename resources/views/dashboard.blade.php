@@ -19,7 +19,7 @@
         }
     @endphp
 
-    <div class="py-12 space-y-28">
+    <div class="py-8 space-y-20">
 
         {{-- ================= HERO CAROUSEL ================= --}}
         <section>
@@ -74,7 +74,9 @@
                 {{-- Activities --}}
                 <div class="relative p-9 rounded-3xl
                             bg-gradient-to-br from-indigo-600 via-purple-600 to-blue-600
-                            text-white shadow-2xl overflow-hidden">
+                            text-white shadow-2xl overflow-hidden
+                            transition-all duration-300
+                            hover:-translate-y-2 hover:shadow-3xl">
                     <div class="absolute -top-10 -right-10 text-white/20 text-[120px]">🤝</div>
                     <p class="uppercase tracking-widest text-sm opacity-80">Activities</p>
                     <h3 class="text-5xl font-black my-2">{{ $activitiesCount }}</h3>
@@ -84,7 +86,9 @@
                 {{-- Organizations --}}
                 <div class="relative p-9 rounded-3xl
                             bg-gradient-to-br from-emerald-500 via-teal-500 to-green-500
-                            text-white shadow-2xl overflow-hidden">
+                            text-white shadow-2xl overflow-hidden
+                            transition-all duration-300
+                            hover:-translate-y-2 hover:shadow-3xl">
                     <div class="absolute -top-10 -right-10 text-white/20 text-[120px]">🏢</div>
                     <p class="uppercase tracking-widest text-sm opacity-80">Partners</p>
                     <h3 class="text-5xl font-black my-2">{{ $orgCount }}</h3>
@@ -94,7 +98,9 @@
                 {{-- Impact --}}
                 <div class="relative p-9 rounded-3xl
                             bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-500
-                            text-gray-900 shadow-2xl overflow-hidden">
+                            text-gray-900 shadow-2xl overflow-hidden
+                            transition-all duration-300
+                            hover:-translate-y-2 hover:shadow-3xl">
                     <div class="absolute -top-10 -right-10 text-black/20 text-[120px]">🌍</div>
                     <p class="uppercase tracking-widest text-sm opacity-80">Impact</p>
                     <h3 class="text-5xl font-black my-2">100%</h3>
@@ -111,7 +117,7 @@
                 {{-- Activities --}}
                 <a href="{{ route('activities.index') }}" class="group">
                     <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
-                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                                shadow hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                         <div class="w-14 h-14 rounded-full
                                     bg-indigo-100 text-indigo-600
                                     flex items-center justify-center mb-6">
@@ -131,7 +137,7 @@
                 {{-- Organizations --}}
                 <a href="{{ route('organizations.index') }}" class="group">
                     <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
-                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                                shadow hover:shadow-2xl transition duration-300 hover:-translate-y-1">
                         <div class="w-14 h-14 rounded-full
                                     bg-emerald-100 text-emerald-600
                                     flex items-center justify-center mb-6">
@@ -151,7 +157,7 @@
                 {{-- Donations --}}
                 <a href="{{ url('/donations') }}" class="group">
                     <div class="relative bg-white dark:bg-gray-800 p-8 rounded-2xl
-                                shadow hover:shadow-2xl transition hover:-translate-y-1">
+                                shadow hover:shadow-2xl transition duration-300 hover:-translate-y-1">
                         <div class="w-14 h-14 rounded-full
                                     bg-amber-100 text-amber-600
                                     flex items-center justify-center mb-6">
@@ -179,7 +185,7 @@
                 @foreach($recentActivities as $a)
                     <a href="{{ route('activities.show', $a->id) }}"
                        class="group bg-white dark:bg-gray-800 rounded-2xl
-                              shadow hover:-translate-y-1 hover:shadow-2xl transition">
+                              shadow hover:-translate-y-1 hover:shadow-2xl transition duration-300">
                         <img src="{{ activity_image($a) }}"
                              class="w-full h-48 object-cover rounded-t-2xl">
 
