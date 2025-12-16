@@ -14,6 +14,8 @@ use App\Http\Controllers\OrganizationController;
 // ================= COMPANY CONTROLLERS =================
 use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyActivityController;
+use App\Http\Controllers\PointsTransactionController;
+use App\Http\Controllers\RewardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +70,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/activities/{activity}/confirm', [ActivityRegistrationController::class, 'confirm'])
         ->name('activities.confirm');
 
-
     /*
     | Organizations
     */
@@ -77,6 +78,20 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/organizations/{company}', [OrganizationController::class, 'show'])
         ->name('organizations.show');
+
+    /*
+    | Rewards
+    */
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/rewards', [RewardController::class, 'index'])->name('rewards.index');
+        Route::post('/rewards/{reward}/redeem', [RewardController::class, 'redeem'])->name('rewards.redeem');
+    });
+
+    /*
+    | Points History
+    */
+    Route::get('/points-history', [PointsTransactionController::class, 'index'])
+        ->name('points.history')->middleware('auth');
 
     /*
     | Donations

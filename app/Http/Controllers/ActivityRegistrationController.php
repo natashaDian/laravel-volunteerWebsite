@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Activity;
 use App\Models\ActivityRegistration;
+use App\Models\PointsTransaction;
 use Illuminate\Support\Facades\Auth;
 
 class ActivityRegistrationController extends Controller
@@ -54,7 +55,15 @@ class ActivityRegistrationController extends Controller
             'status' => 'confirmed',
         ]);
 
-        return back()->with('success', 'Participation confirmed successfully.');
+        PointsTransaction::create([
+            'user_id'     => Auth::id(),
+            'points'      => 20,
+            'source_type' => 'activity',
+            'source_id'   => $activity->id,
+            'description' => $activity->title,
+        ]);
+
+        return back()->with('success', 'Participation confirmed successfully. Points have been added to your account.');
     }
 
 }

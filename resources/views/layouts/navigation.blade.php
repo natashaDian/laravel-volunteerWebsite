@@ -25,6 +25,10 @@
                             {{ __('Find Organizations') }}
                         </x-nav-link>
 
+                        <x-nav-link :href="route('rewards.index')" :active="request()->routeIs('rewards.*')">
+                            {{ __('Rewards Redeem') }}
+                        </x-nav-link>
+
                         <x-nav-link :href="route('donations.index')" :active="request()->routeIs('donations.*')">
                             {{ __('Donations') }}
                         </x-nav-link>
@@ -83,6 +87,10 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
+
+                <a href="{{ route('points.history') }}" class="text-sm text-gray-600 hover:text-gray-800">
+                    🌟 {{ auth()->user()->total_points }} Points
+                </a>
             </div>
 
             <!-- Hamburger (mobile) -->

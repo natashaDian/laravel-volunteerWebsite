@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\PointsTransaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -53,4 +54,15 @@ class User extends Authenticatable
     {
         return $this->hasMany(ActivityRegistration::class);
     }
+
+    public function pointTransactions()
+    {
+        return $this->hasMany(PointsTransaction::class);
+    }
+
+    public function getTotalPointsAttribute()
+    {
+        return $this->pointTransactions()->sum('points');
+    }
+
 }

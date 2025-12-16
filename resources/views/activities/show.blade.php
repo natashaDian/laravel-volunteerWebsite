@@ -70,11 +70,11 @@
 
                 {{-- RIGHT : CONTENT --}}
                 <div class="md:w-1/2 p-6 flex flex-col">
-                    @if(session('success'))
+                    {{-- @if(session('success'))
                         <div class="mb-4 p-3 bg-green-100 text-green-700 rounded">
                             {{ session('success') }}
                         </div>
-                    @endif
+                    @endif --}}
 
                     @if(session('error'))
                         <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
@@ -83,7 +83,14 @@
                     @endif
 
                     @if($registration)
-                        @if($registration->status === 'approved')
+                        @if($registration->status === 'pending')
+                            <div class="mb-4 p-4 rounded-lg bg-yellow-50 text-yellow-800 border border-yellow-200">
+                                <strong>Registration Submitted</strong><br>
+                                Your registration has been successfully submitted.
+                                Please wait for the organization’s review and announcement.
+                            </div>
+
+                        @elseif($registration->status === 'approved')
                             <div class="mb-4 p-4 rounded-lg bg-green-50 text-green-800 border border-green-200">
                                 <strong>Action Required</strong><br>
                                 Your registration has been approved.
@@ -97,6 +104,14 @@
                                 Unfortunately, your registration could not be approved at this time.
                                 Please feel free to join other upcoming activities.
                             </div>
+
+                        @elseif($registration->status === 'confirmed')
+                            <div class="mb-4 p-4 rounded-lg bg-purple-50 text-purple-800 border border-purple-200">
+                                <strong>Points Earned 🎉</strong><br>
+                                Thank you for participating in this activity.
+                                Your points have been successfully added to your account.
+                            </div>
+
                         @endif
                     @endif
 
