@@ -87,10 +87,12 @@
                         </form>
                     </x-slot>
                 </x-dropdown>
-
+                
+                @if (!auth('company')->check())
                 <a href="{{ route('points.history') }}" class="text-sm text-gray-600 hover:text-gray-800">
                     🌟 {{ auth()->user()->total_points }} Points
                 </a>
+                @endif
             </div>
 
             <!-- Hamburger (mobile) -->

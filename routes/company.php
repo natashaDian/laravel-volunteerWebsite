@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyAuthController;
 use App\Http\Controllers\CompanyDashboardController;
 use App\Http\Controllers\CompanyEventController;
+use App\Http\Controllers\CompanyActivityController;
 
 Route::middleware('web')->group(function () {
 
@@ -24,13 +25,14 @@ Route::middleware('web')->group(function () {
         Route::post('/events/store', [CompanyEventController::class, 'store'])
             ->name('company.events.store');
 
-        Route::get('/events/{id}/edit', [CompanyEventController::class, 'edit'])
-            ->name('company.events.edit');
+        Route::get('/activities/{id}/edit', [CompanyActivityController::class, 'edit'])
+        ->name('company.activities.edit');
 
-        Route::put('/events/{id}', [CompanyEventController::class, 'update'])
-            ->name('company.events.update');
+        Route::put('/activities/{id}', [CompanyActivityController::class, 'update'])
+            ->name('company.activities.update');
 
-        Route::delete('/events/{id}', [CompanyEventController::class, 'destroy'])
-            ->name('company.events.delete');
+        Route::delete('/activities/{id}', [CompanyActivityController::class, 'destroy'])
+            ->name('company.activities.destroy');
+
     });
 });

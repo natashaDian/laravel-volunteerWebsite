@@ -95,4 +95,37 @@ class ActivityController extends Controller
 
         return view('activities.show', compact('activity', 'companyName'));
     }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'company_code' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png'
+        ]);
+
+        $activity = new Activity();
+        $activity->title = $request->title;
+        $activity->description = $request->description;
+        $activity->start_date = $request->start_date;
+        $activity->end_date = $request->end_date;
+        $activity->company_code = $request->company_code;
+
+        // ===== INI KUNCI IMAGE =====
+        if ($request->hasFile('image')) {
+            $filename = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('img'), $filename);
+
+            // SIMPAN RELATIF DARI public/
+            $activity->image_url = 'img/' . $filename;
+        }
+
+        $activity->save();
+
+        return redirect()->route('activities.index');
+}
+
 }

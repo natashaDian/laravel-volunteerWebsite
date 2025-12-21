@@ -3,23 +3,31 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ActivityRegistration;
 
 class Activity extends Model
 {
-    protected $table = 'activities';
-
     protected $fillable = [
         'title',
         'description',
-        'location',
         'start_date',
-        'quota',
+        'end_date',
         'company_code',
+        'image_url',
     ];
+
+    protected $appends = ['image_src'];
+
+    public function getImageSrcAttribute()
+    {
+        if ($this->image_url && file_exists(public_path($this->image_url))) {
+            return asset($this->image_url);
+        }
+
+        return asset('img/default.jpg');
+    }
 
     public function registrations()
     {
-        return $this->hasMany(ActivityRegistration::class, 'activity_id');
+        return $this->hasMany(ActivityRegistration::class);
     }
 }

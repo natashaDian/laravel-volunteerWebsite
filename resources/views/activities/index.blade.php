@@ -17,12 +17,31 @@
         ];
 
         function img($a) {
-            if (!empty($a->image_url)) {
-                if (filter_var($a->image_url, FILTER_VALIDATE_URL)) return $a->image_url;
-                if (file_exists(public_path($a->image_url))) return asset($a->image_url);
+        if (!empty($a->image_url)) {
+
+            // kalau sudah full URL
+            if (filter_var($a->image_url, FILTER_VALIDATE_URL)) {
+                return $a->image_url;
             }
-            return asset('images/default.jpg');
+
+            // bersihin slash depan
+            $path = ltrim($a->image_url, '/');
+
+            // kalau cuma nama file → arahkan ke public/img
+            if (!str_contains($path, '/')) {
+                $path = 'img/' . $path;
+            }
+
+            // kalau sudah img/xxx.jpg
+            if (file_exists(public_path($path))) {
+                return asset($path);
+            }
         }
+
+        return asset('img/default.jpg');
+    }
+
+
     @endphp
 
     {{-- ================= FILTER BAR ================= --}}
