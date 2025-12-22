@@ -19,6 +19,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-07-05',
                 'category' => 'Lingkungan',
                 'location' => 'Pantai Indah',
+                'quota' => 50,
             ],
             [
                 'title' => 'After-School Tutoring for Underprivileged Kids',
@@ -27,6 +28,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-08-30',
                 'category' => 'Pendidikan',
                 'location' => 'Pusat Komunitas Utama',
+                'quota' => 40,
             ],
             [
                 'title' => 'Senior Care Visit & Conversation',
@@ -35,6 +37,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-09-10',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Panti Wredha Harapan',
+                'quota' => 50,
             ],
             [
                 'title' => 'Urban Tree Planting Weekend',
@@ -43,6 +46,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-10-19',
                 'category' => 'Lingkungan',
                 'location' => 'Taman Kota',
+                'quota' => 50,
             ],
             [
                 'title' => 'Mobile Health Clinic Support',
@@ -51,6 +55,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-11-02',
                 'category' => 'Kesehatan',
                 'location' => 'Lapangan Serbaguna',
+                'quota' => 50,
             ],
             [
                 'title' => 'Literacy Campaign: Book Donation & Reading',
@@ -59,6 +64,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-12-03',
                 'category' => 'Pendidikan',
                 'location' => 'Perpustakaan Sekitar',
+                'quota' => 50,
             ],
             [
                 'title' => 'Youth Leadership Workshop Facilitation',
@@ -67,6 +73,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-12-11',
                 'category' => 'Pengembangan Anak Muda',
                 'location' => 'Aula Serbaguna',
+                'quota' => 50,
             ],
             [
                 'title' => 'Food Drive & Distribution for Families in Need',
@@ -75,6 +82,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2025-12-20',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Gereja & Pusat Komunitas',
+                'quota' => 50,
             ],
             [
                 'title' => 'Disaster Preparedness Community Training',
@@ -83,6 +91,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-16',
                 'category' => 'Kesiapsiagaan',
                 'location' => 'Balai Desa',
+                'quota' => 50,
             ],
             [
                 'title' => 'Recycling Workshop for Schools',
@@ -91,6 +100,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-05',
                 'category' => 'Lingkungan',
                 'location' => 'Sekolah Dasar Negeri 3',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Mural Painting Project',
@@ -99,6 +109,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-03-12',
                 'category' => 'Seni dan Budaya',
                 'location' => 'Gang Seni',
+                'quota' => 50,
             ],
             [
                 'title' => 'Skills Bootcamp: Basic Computer for Jobseekers',
@@ -107,6 +118,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-03-27',
                 'category' => 'Pengembangan Anak Muda',
                 'location' => 'Kantor Komunitas',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Health Awareness Campaign',
@@ -115,6 +127,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-04-07',
                 'category' => 'Kesehatan',
                 'location' => 'Alun-alun Kota',
+                'quota' => 50,
             ],
             [
                 'title' => 'Accessible Playground Build',
@@ -123,6 +136,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-04-22',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Taman Anak',
+                'quota' => 50,
             ],
             [
                 'title' => 'Coastal Wildlife Monitoring Patrol',
@@ -131,6 +145,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-05-06',
                 'category' => 'Lingkungan',
                 'location' => 'Pesisir Selatan',
+                'quota' => 50,
             ],
             [
                 'title' => 'Career Mentoring for High School Seniors',
@@ -139,6 +154,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-05-20',
                 'category' => 'Pendidikan',
                 'location' => 'SMAN 1',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Sports Day & Volunteer Marshals',
@@ -147,6 +163,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-06-08',
                 'category' => 'Kegiatan Komunitas',
                 'location' => 'Lapangan Bola',
+                'quota' => 50,
             ],
             [
                 'title' => 'Neighborhood Home Repairs for Elderly',
@@ -155,6 +172,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-06-19',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Komunitas RW 07',
+                'quota' => 50,
             ],
             [
                 'title' => 'Youth Environmental Film Screening',
@@ -163,6 +181,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-07-02',
                 'category' => 'Seni dan Budaya',
                 'location' => 'Gedung Serba Guna',
+                'quota' => 50,
             ],
             [
                 'title' => 'Skills Exchange: Sewing & Crafting for Income',
@@ -171,6 +190,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-07-17',
                 'category' => 'Pengembangan Komunitas',
                 'location' => 'Ruang Kegiatan Lokal',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Food Sharing Program',
@@ -179,6 +199,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-15',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Balai Warga',
+                'quota' => 50,
             ],
             [
                 'title' => 'Learning Support for Elementary Students',
@@ -187,6 +208,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-20',
                 'category' => 'Pendidikan',
                 'location' => 'Pusat Belajar',
+                'quota' => 50,
             ],
             [
                 'title' => 'Public Park Care Initiative',
@@ -195,6 +217,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-01',
                 'category' => 'Lingkungan',
                 'location' => 'Taman Kota',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Health Assistance Program',
@@ -203,6 +226,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-31',
                 'category' => 'Kesehatan',
                 'location' => 'Puskesmas',
+                'quota' => 50,
             ],
             [
                 'title' => 'Youth Skill Development Sessions',
@@ -211,6 +235,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-10',
                 'category' => 'Pengembangan Anak Muda',
                 'location' => 'Ruang Kreatif',
+                'quota' => 50,
             ],
             [
                 'title' => 'Elderly Companion & Support Visits',
@@ -219,6 +244,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-25',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Panti Wredha',
+                'quota' => 50,
             ],
             [
                 'title' => 'Neighborhood Waste Sorting Initiative',
@@ -227,6 +253,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-05',
                 'category' => 'Lingkungan',
                 'location' => 'TPS Terpadu',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Disaster Readiness Program',
@@ -235,6 +262,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-22',
                 'category' => 'Kesiapsiagaan',
                 'location' => 'Balai Desa',
+                'quota' => 50,
             ],
             [
                 'title' => 'School Meal Support Activities',
@@ -243,6 +271,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-18',
                 'category' => 'Pendidikan',
                 'location' => 'Sekolah Negeri',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Art & Creative Workshops',
@@ -251,6 +280,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-01',
                 'category' => 'Seni dan Budaya',
                 'location' => 'Ruang Seni',
+                'quota' => 50,
             ],
             [
                 'title' => 'Digital Skills Support for Jobseekers',
@@ -259,6 +289,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-15',
                 'category' => 'Pengembangan Anak Muda',
                 'location' => 'Lab Komputer',
+                'quota' => 50,
             ],
             [
                 'title' => 'Community Recycling Education Program',
@@ -267,6 +298,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-30',
                 'category' => 'Lingkungan',
                 'location' => 'Bank Sampah',
+                'quota' => 50,
             ],
             [
                 'title' => 'Local Sports & Fitness Activities',
@@ -275,6 +307,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-17',
                 'category' => 'Kegiatan Komunitas',
                 'location' => 'Lapangan Olahraga',
+                'quota' => 50,
             ],
             [
                 'title' => 'Home Safety Improvement for Seniors',
@@ -283,6 +316,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-02-09',
                 'category' => 'Kesejahteraan Sosial',
                 'location' => 'Lingkungan RW',
+                'quota' => 50,
             ],
             [
                 'title' => 'Children Reading Corner Program',
@@ -291,6 +325,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => '2026-01-28',
                 'category' => 'Pendidikan',
                 'location' => 'Perpustakaan Komunitas',
+                'quota' => 50,
             ],
         ];
 
@@ -304,7 +339,7 @@ class ActivitySeeder extends Seeder
             // bentuk image_url
             $imageUrl = 'img/' . ($cleanFirst ?: 'default') . '.jpg';
 
-            Activity::create([
+            Activity::factory()->create([
                 'title' => $act['title'],
                 'description' => $act['description'],
                 'image_url' => $imageUrl,
@@ -312,6 +347,7 @@ class ActivitySeeder extends Seeder
                 'end_date' => $act['end_date'],
                 'category' => $act['category'],
                 'location' => $act['location'] ?? null,
+                'quota' => $act['quota'],
                 // company_code random dari COO1..COO5
                 'company_code' => $companyCodes[array_rand($companyCodes)],
             ]);

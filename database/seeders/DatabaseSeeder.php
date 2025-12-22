@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             EventRegistrationSeeder::class,
             ActivitySeeder::class,
             RewardSeeder::class,
+            ActivityRegistrationSeeder::class,
         ]);
     }
 }

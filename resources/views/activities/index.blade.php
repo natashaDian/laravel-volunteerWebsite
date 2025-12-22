@@ -149,8 +149,14 @@
                                     🏢 {{ $companyName }}
                                 </p>
 
-                                <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
-                                    📅 {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
+                                <div class="mt-auto pt-3 text-xs text-gray-500 border-t flex">
+                                    <span class="mr-auto">
+                                        📅 {{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}
+                                    </span>
+
+                                    <span>
+                                        👤 {{ $a->registrations()->count() }}/{{ $a->quota ?? 'N/A' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>

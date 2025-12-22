@@ -185,7 +185,8 @@
                 @foreach($recentActivities as $a)
                     <a href="{{ route('activities.show', $a->id) }}"
                        class="group bg-white dark:bg-gray-800 rounded-2xl
-                              shadow hover:-translate-y-1 hover:shadow-2xl transition duration-300">
+                              shadow hover:-translate-y-1 hover:shadow-2xl transition duration-300
+                              h-full flex flex-col">
                         <img src="{{ activity_image($a) }}"
                              class="w-full h-48 object-cover rounded-t-2xl">
 
@@ -200,9 +201,26 @@
                                 {{ $a->title }}
                             </h4>
 
-                            <p class="text-sm text-gray-500">
-                                🏢 {{ $companies[$a->company_code] ?? $a->organizer ?? 'Organization' }}
-                            </p>
+                            <div class="mt-auto pt-3 border-t text-xs text-gray-500">
+                                <div class="grid grid-cols-3 items-center text-center">
+                                    <div class="flex items-center justify-start gap-1">
+                                        <span class="leading-none">📅</span>
+                                        <span>{{ \Carbon\Carbon::parse($a->start_date)->format('d M Y') }}</span>
+                                    </div>
+
+                                    <div class="flex items-center justify-center gap-1 truncate">
+                                        <span class="leading-none">🏢</span>
+                                        <span class="truncate">
+                                            {{ $companies[$a->company_code] ?? $a->organizer ?? 'Organization' }}
+                                        </span>
+                                    </div>
+
+                                    <div class="flex items-center justify-end gap-1">
+                                        <span class="leading-none">👤</span>
+                                        <span>{{ $a->registrations()->count() }}/{{ $a->quota ?? 'N/A' }}</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </a>
                 @endforeach

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->enum('status', ['pending', 'approved', 'rejected', 'confirmed'])->default('pending');
 
             $table->string('motivation')->nullable();
-            $table->string('phone')->nullable();
             $table->string('confirmation_code')->nullable();
 
             $table->timestamps();

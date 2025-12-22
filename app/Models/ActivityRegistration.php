@@ -10,7 +10,6 @@ class ActivityRegistration extends Model
         'activity_id',
         'user_id',
         'motivation',
-        'phone',
         'status',
         'confirmation_code'
     ];
