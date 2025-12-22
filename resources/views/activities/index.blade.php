@@ -17,31 +17,25 @@
         ];
 
         function img($a) {
-        if (!empty($a->image_url)) {
+            if (!empty($a->image_url)) {
 
-            // kalau sudah full URL
-            if (filter_var($a->image_url, FILTER_VALIDATE_URL)) {
-                return $a->image_url;
+                if (filter_var($a->image_url, FILTER_VALIDATE_URL)) {
+                    return $a->image_url;
+                }
+
+                $path = ltrim($a->image_url, '/');
+
+                if (!str_contains($path, '/')) {
+                    $path = 'img/' . $path;
+                }
+
+                if (file_exists(public_path($path))) {
+                    return asset($path);
+                }
             }
 
-            // bersihin slash depan
-            $path = ltrim($a->image_url, '/');
-
-            // kalau cuma nama file → arahkan ke public/img
-            if (!str_contains($path, '/')) {
-                $path = 'img/' . $path;
-            }
-
-            // kalau sudah img/xxx.jpg
-            if (file_exists(public_path($path))) {
-                return asset($path);
-            }
+            return asset('img/default.jpg');
         }
-
-        return asset('img/default.jpg');
-    }
-
-
     @endphp
 
     {{-- ================= FILTER BAR ================= --}}
@@ -51,6 +45,7 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-4
                     grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
 
+            {{-- KEYWORD --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Keyword</label>
                 <input type="text" name="q" value="{{ request('q') }}"
@@ -58,6 +53,7 @@
                        placeholder="Search title / description">
             </div>
 
+            {{-- CATEGORY --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Category</label>
                 <select name="category" class="w-full mt-1 rounded border-gray-300">
@@ -70,6 +66,7 @@
                 </select>
             </div>
 
+            {{-- ORGANIZATION --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Organization</label>
                 <select name="company" class="w-full mt-1 rounded border-gray-300">
@@ -82,12 +79,15 @@
                 </select>
             </div>
 
+            {{-- START AFTER --}}
             <div>
                 <label class="text-sm font-medium text-gray-600">Start After</label>
-                <input type="date" name="start_date" value="{{ request('start_date') }}"
+                <input type="date" name="start_date"
+                       value="{{ request('start_date') }}"
                        class="w-full mt-1 rounded border-gray-300">
             </div>
 
+            {{-- ACTION --}}
             <div class="flex gap-2">
                 <button class="px-4 py-2 bg-indigo-600 text-white rounded-lg">
                     Apply
@@ -106,6 +106,7 @@
         @if($ongoing->count())
         <section>
             <h3 class="text-2xl font-bold mb-5">🔥 Ongoing Activities</h3>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($ongoing as $a)
                     @php
@@ -116,15 +117,14 @@
 
                     <a href="{{ route('activities.show', $a->id) }}">
                         <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
-                                    hover:shadow-2xl hover:-translate-y-1 transition-all duration-300
-                                    border border-transparent hover:border-green-300 h-full flex flex-col">
+                                    hover:shadow-xl hover:-translate-y-1 transition h-full flex flex-col">
 
                             <div class="relative h-48 overflow-hidden">
                                 <img src="{{ img($a) }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition">
 
                                 <div class="absolute top-2 left-2 flex gap-1">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
                                         Ongoing
                                     </span>
 
@@ -137,9 +137,7 @@
                             </div>
 
                             <div class="p-4 flex flex-col flex-1">
-                                <h4 class="font-semibold text-gray-900 dark:text-white">
-                                    {{ $a->title }}
-                                </h4>
+                                <h4 class="font-semibold">{{ $a->title }}</h4>
 
                                 <p class="text-sm text-gray-500 mt-2 line-clamp-3">
                                     {{ $a->description }}
@@ -164,6 +162,7 @@
         @if($upcoming->count())
         <section>
             <h3 class="text-2xl font-bold mb-5">⏳ Upcoming Activities</h3>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($upcoming as $a)
                     @php
@@ -174,30 +173,21 @@
 
                     <a href="{{ route('activities.show', $a->id) }}">
                         <div class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow
-                                    hover:shadow-xl hover:-translate-y-1 transition
-                                    border border-transparent hover:border-yellow-300 h-full flex flex-col">
+                                    hover:shadow-xl hover:-translate-y-1 transition h-full flex flex-col">
 
                             <div class="relative h-48 overflow-hidden">
                                 <img src="{{ img($a) }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition">
 
                                 <div class="absolute top-2 left-2 flex gap-1">
-                                    <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
                                         Upcoming
                                     </span>
-
-                                    @if($a->category)
-                                        <span class="px-2 py-1 text-xs rounded {{ $catColor }}">
-                                            {{ $a->category }}
-                                        </span>
-                                    @endif
                                 </div>
                             </div>
 
                             <div class="p-4 flex flex-col flex-1">
-                                <h4 class="font-semibold text-gray-900 dark:text-white">
-                                    {{ $a->title }}
-                                </h4>
+                                <h4 class="font-semibold">{{ $a->title }}</h4>
 
                                 <p class="text-sm text-gray-500 mt-2 line-clamp-3">
                                     {{ $a->description }}
@@ -222,6 +212,7 @@
         @if($ended->count())
         <section>
             <h3 class="text-2xl font-bold mb-5">❌ Past Activities</h3>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 opacity-70">
                 @foreach($ended as $a)
                     @php
@@ -229,22 +220,24 @@
                     @endphp
 
                     <a href="{{ route('activities.show', $a->id) }}">
-                        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow border h-full flex flex-col">
+                        <div class="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow h-full flex flex-col">
+
                             <div class="h-48 grayscale">
-                                <img src="{{ img($a) }}" class="w-full h-full object-cover">
+                                <img src="{{ img($a) }}"
+                                     class="w-full h-full object-cover">
                             </div>
 
                             <div class="p-4 flex flex-col flex-1">
-                                <h4 class="font-semibold text-gray-700 dark:text-gray-300">
+                                <h4 class="font-semibold text-gray-600">
                                     {{ $a->title }}
                                 </h4>
 
-                                <p class="text-sm text-gray-600 mt-2">
+                                <p class="text-sm text-gray-500 mt-2">
                                     🏢 {{ $companyName }}
                                 </p>
 
                                 <div class="mt-auto pt-3 text-xs text-gray-500 border-t">
-                                    Ended on {{ \Carbon\Carbon::parse($a->end_date)->format('d M Y') }}
+                                    Ended {{ \Carbon\Carbon::parse($a->end_date)->format('d M Y') }}
                                 </div>
                             </div>
                         </div>

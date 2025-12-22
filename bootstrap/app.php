@@ -3,6 +3,8 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,7 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // 🔥 OVERRIDE AUTH REDIRECT (INI KUNCINYA)
+        $middleware->redirectGuestsTo(function ($request) {
+
+            if ($request->is('company/*')) {
+                return route('company.login');
+            }
+
+            return route('login');
+        });
+
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

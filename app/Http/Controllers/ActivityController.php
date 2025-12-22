@@ -2,73 +2,84 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Activity;
 use App\Models\Company;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ActivityController extends Controller
 {
-    /**
-     * Display a listing of activities with optional filters.
-     */
     public function index(Request $request)
     {
-        $today = now()->startOfDay();
+        // ===============================
+        // BASE QUERY
+        // ===============================
+        $query = Activity::query();
 
-        // map company_code => name
-        $companies = Company::pluck('name', 'company_code')->toArray();
+        // ===============================
+        // KEYWORD FILTER (title + description ONLY)
+        // ===============================
+        if ($request->filled('q')) {
+            $keyword = $request->q;
 
-        // ================= BASE FILTER =================
-        $baseQuery = Activity::query();
-
-        if ($q = $request->query('q')) {
-            $baseQuery->where(function ($sub) use ($q) {
-                $sub->where('title', 'like', "%$q%")
-                    ->orWhere('description', 'like', "%$q%")
-                    ->orWhere('organizer', 'like', "%$q%");
+            $query->where(function ($q) use ($keyword) {
+                $q->where('title', 'like', "%{$keyword}%")
+                  ->orWhere('description', 'like', "%{$keyword}%");
             });
         }
 
-        if ($cat = $request->query('category')) {
-            $baseQuery->where('category', $cat);
+        // ===============================
+        // CATEGORY FILTER
+        // ===============================
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
         }
 
-        if ($loc = $request->query('location')) {
-            $baseQuery->where('location', 'like', "%$loc%");
+        // ===============================
+        // ORGANIZATION FILTER (company_code)
+        // ===============================
+        if ($request->filled('company')) {
+            $query->where('company_code', $request->company);
         }
 
-        if ($comp = $request->query('company')) {
-            $baseQuery->where('company_code', $comp);
+        // ===============================
+        // START AFTER FILTER
+        // ===============================
+        if ($request->filled('start_date')) {
+            $query->whereDate('start_date', '>=', $request->start_date);
         }
 
-        if ($start = $request->query('start_date')) {
-            $baseQuery->whereDate('start_date', '>=', $start);
-        }
+        // ===============================
+        // ORDERING
+        // ===============================
+        $query->orderBy('start_date', 'asc');
 
-        if ($end = $request->query('end_date')) {
-            $baseQuery->whereDate('end_date', '<=', $end);
-        }
+        // ===============================
+        // SPLIT STATUS
+        // ===============================
+        $today = Carbon::today();
 
-        // ================= STATUS SPLIT =================
-        $ongoing = (clone $baseQuery)
+        $ongoing = (clone $query)
             ->whereDate('start_date', '<=', $today)
             ->where(function ($q) use ($today) {
                 $q->whereNull('end_date')
-                ->orWhereDate('end_date', '>=', $today);
+                  ->orWhereDate('end_date', '>=', $today);
             })
-            ->orderBy('start_date')
             ->get();
 
-        $upcoming = (clone $baseQuery)
+        $upcoming = (clone $query)
             ->whereDate('start_date', '>', $today)
-            ->orderBy('start_date')
             ->get();
 
-        $ended = (clone $baseQuery)
+        $ended = (clone $query)
+            ->whereNotNull('end_date')
             ->whereDate('end_date', '<', $today)
-            ->orderByDesc('end_date')
             ->get();
+
+        // ===============================
+        // COMPANY LIST (company_code => name)
+        // ===============================
+        $companies = Company::pluck('name', 'company_code')->toArray();
 
         return view('activities.index', compact(
             'ongoing',
@@ -78,54 +89,8 @@ class ActivityController extends Controller
         ));
     }
 
-
-    /**
-     * Display the specified activity.
-     */
     public function show(Activity $activity)
     {
-        // ambil nama perusahaan berdasarkan company_code
-        $companyName = null;
-        if ($activity->company_code) {
-            $company = Company::where('company_code', $activity->company_code)->first();
-            if ($company) {
-                $companyName = $company->name;
-            }
-        }
-
-        return view('activities.show', compact('activity', 'companyName'));
+        return view('activities.show', compact('activity'));
     }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'company_code' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png'
-        ]);
-
-        $activity = new Activity();
-        $activity->title = $request->title;
-        $activity->description = $request->description;
-        $activity->start_date = $request->start_date;
-        $activity->end_date = $request->end_date;
-        $activity->company_code = $request->company_code;
-
-        // ===== INI KUNCI IMAGE =====
-        if ($request->hasFile('image')) {
-            $filename = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('img'), $filename);
-
-            // SIMPAN RELATIF DARI public/
-            $activity->image_url = 'img/' . $filename;
-        }
-
-        $activity->save();
-
-        return redirect()->route('activities.index');
-}
-
 }

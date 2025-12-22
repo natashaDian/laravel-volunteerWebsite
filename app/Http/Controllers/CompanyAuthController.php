@@ -9,19 +9,25 @@ class CompanyAuthController extends Controller
 {
     public function showLoginForm()
     {
-        return view('company.login');
+        return view('company.auth.login');
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
+        // 🔥 INI KUNCI UTAMA
         if (Auth::guard('company')->attempt($credentials)) {
+            $request->session()->regenerate();
+
             return redirect()->route('company.dashboard');
         }
 
         return back()->withErrors([
-            'email' => 'Email atau password salah.',
+            'email' => 'Invalid company credentials.',
         ]);
     }
 }
