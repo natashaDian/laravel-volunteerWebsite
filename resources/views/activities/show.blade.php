@@ -206,7 +206,6 @@
                     <label class="text-sm font-medium text-gray-600">Motivation</label>
                     <textarea name="motivation" class="w-full mt-1 rounded border-gray-300" rows="3" placeholder="Why do you want to join?"></textarea>
                 </div>
-
                 <p class="text-xs text-gray-500 mb-4">
                     By registering, you agree that the organization may contact you via your phone number. Please check again in your profile.
                 </p>
