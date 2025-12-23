@@ -84,12 +84,17 @@
                         </div>
 
                         {{-- STATS (UNCHANGED STYLE) --}}
-                        <div class="flex gap-4 pt-4">
+                        <div class="flex gap-4 pt-4 flex-wrap">
                             <span class="px-5 py-2 rounded-full bg-emerald-100 text-emerald-800 text-sm font-semibold">
-                                {{ $ongoingCount ?? 0 }} Ongoing Activities
+                                {{ $ongoingActivities->count() }} Ongoing Activities
                             </span>
+
                             <span class="px-5 py-2 rounded-full bg-amber-100 text-amber-800 text-sm font-semibold">
-                                {{ $upcomingCount ?? 0 }} Upcoming Activities
+                                {{ $upcomingActivities->count() }} Upcoming Activities
+                            </span>
+
+                            <span class="px-5 py-2 rounded-full bg-red-200 text-red-700 text-sm font-semibold">
+                                {{ $pastActivities->count() }} Past Activities
                             </span>
                         </div>
                     </div>
@@ -97,48 +102,124 @@
             </div>
         </div>
 
-        {{-- ================= ACTIVITIES SECTION ================= --}}
+        {{-- ================= ONGOING ACTIVITIES ================= --}}
+        @if($ongoingActivities->count())
         <section class="space-y-8">
-
             <h3 class="text-2xl font-bold text-indigo-700 dark:text-indigo-300">
-                Activities by {{ $company->name }}
+                Ongoing Activities
             </h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                @forelse($activities as $activity)
+                @foreach($ongoingActivities as $activity)
                     <a href="{{ route('activities.show', $activity->id) }}"
-                       class="group relative rounded-2xl p-6
-                              bg-gradient-to-br
-                              from-indigo-50 via-purple-50 to-violet-50
-                              dark:from-gray-800 dark:via-gray-800 dark:to-gray-800
-                              shadow hover:shadow-2xl
-                              transition hover:-translate-y-1">
+                    class="group relative rounded-2xl p-6
+                            bg-gradient-to-br
+                            from-indigo-50 via-purple-50 to-violet-50
+                            dark:from-gray-800 dark:to-gray-800
+                            shadow hover:shadow-2xl
+                            transition hover:-translate-y-1">
 
-                        {{-- TOP ACCENT --}}
                         <div class="absolute inset-x-0 top-0 h-1 rounded-t-2xl
                                     bg-gradient-to-r from-indigo-500 to-purple-500"></div>
 
                         <h4 class="font-bold text-lg text-gray-900 dark:text-white
-                                   group-hover:text-indigo-600 transition">
+                                group-hover:text-indigo-600 transition">
                             {{ $activity->title }}
                         </h4>
 
                         <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                            {{ \Carbon\Carbon::parse($activity->start_date)->format('d M Y') }}
+                            Ends on {{ \Carbon\Carbon::parse($activity->end_date)->format('d M Y') }}
                         </p>
 
-                        <div class="mt-5 inline-flex items-center gap-2
-                                    text-sm text-indigo-600 font-semibold">
+                        <div class="mt-5 text-sm font-semibold text-indigo-600">
                             View Details →
                         </div>
                     </a>
-                @empty
-                    <p class="text-gray-500 col-span-full">
-                        No activities available for this organization.
-                    </p>
-                @endforelse
+                @endforeach
             </div>
         </section>
+        @endif
+
+        {{-- ================= UPCOMING ACTIVITIES ================= --}}
+        @if($upcomingActivities->count())
+        <section class="space-y-8">
+            <h3 class="text-2xl font-bold text-indigo-700 dark:text-indigo-300">
+                Upcoming Activities
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($upcomingActivities as $activity)
+                    <a href="{{ route('activities.show', $activity->id) }}"
+                    class="group relative rounded-2xl p-6
+                            bg-gradient-to-br
+                            from-indigo-50 via-purple-50 to-violet-50
+                            dark:from-gray-800 dark:to-gray-800
+                            shadow hover:shadow-2xl
+                            transition hover:-translate-y-1">
+
+                        <div class="absolute inset-x-0 top-0 h-1 rounded-t-2xl
+                                    bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+
+                        <h4 class="font-bold text-lg text-gray-900 dark:text-white
+                                group-hover:text-indigo-600 transition">
+                            {{ $activity->title }}
+                        </h4>
+
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                            Starts on {{ \Carbon\Carbon::parse($activity->start_date)->format('d M Y') }}
+                        </p>
+
+                        <div class="mt-5 text-sm font-semibold text-indigo-600">
+                            View Details →
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+        @endif
+
+        {{-- ================= PAST ACTIVITIES ================= --}}
+        @if($pastActivities->count())
+        <section class="space-y-8">
+
+            <h3 class="text-2xl font-bold text-gray-800">
+                Past Activities
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach($pastActivities as $activity)
+                    <a href="{{ route('activities.show', $activity->id) }}"
+                    class="group relative rounded-2xl p-6
+                            bg-gradient-to-br
+                            from-gray-100 via-gray-100 to-gray-200
+                            dark:from-gray-800 dark:to-gray-900
+                            shadow
+                            opacity-70 hover:opacity-100
+                            transition">
+
+                        <div class="absolute inset-x-0 top-0 h-1 rounded-t-2xl
+                                    bg-gray-400"></div>
+
+                        <h4 class="font-bold text-lg text-gray-600
+                                group-hover:text-gray-800 transition">
+                            {{ $activity->title }}
+                        </h4>
+
+                        <p class="text-sm text-gray-500 mt-2">
+                            Ended on
+                            {{ \Carbon\Carbon::parse($activity->end_date)->format('d M Y') }}
+                        </p>
+
+                        <div class="mt-5 text-sm font-semibold text-gray-400
+                                    group-hover:text-gray-600">
+                            View Details →
+                        </div>
+                    </a>
+                @endforeach
+            </div>
+
+        </section>
+        @endif
 
     </div>
 </x-app-layout>

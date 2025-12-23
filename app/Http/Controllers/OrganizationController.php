@@ -22,15 +22,20 @@ class OrganizationController extends Controller
         $today = now()->toDateString();
 
         $query->withCount([
-            // 🟢 ONGOING: sedang berlangsung
+            // ONGOING: sedang berlangsung
             'activities as ongoing_count' => function ($q) use ($today) {
                 $q->whereDate('start_date', '<=', $today)
                 ->whereDate('end_date', '>=', $today);
             },
 
-            // 🟡 UPCOMING: belum mulai
+            // UPCOMING: belum mulai
             'activities as upcoming_count' => function ($q) use ($today) {
                 $q->whereDate('start_date', '>', $today);
+            },
+
+            // PAST: sudah lewat
+            'activities as past_count' => function ($q) use ($today) {
+                $q->whereDate('end_date', '<', $today);
             },
         ]);
 
@@ -44,28 +49,32 @@ class OrganizationController extends Controller
     public function show($id)
     {
         $company = Company::findOrFail($id);
-
-        $activities = Activity::where('company_code', $company->company_code)
-            ->orderBy('start_date', 'asc')
-            ->get();
-
         $today = now()->startOfDay();
 
         // ONGOING: sudah mulai
-        $ongoingCount = Activity::where('company_code', $company->company_code)
+        $ongoingActivities = Activity::where('company_code', $company->company_code)
             ->whereDate('start_date', '<=', $today)
-            ->count();
+            ->whereDate('end_date', '>=', $today)
+            ->orderBy('start_date')
+            ->get();
 
         // UPCOMING: belum mulai
-        $upcomingCount = Activity::where('company_code', $company->company_code)
+        $upcomingActivities = Activity::where('company_code', $company->company_code)
             ->whereDate('start_date', '>', $today)
-            ->count();
+            ->orderBy('start_date')
+            ->get();
+
+        // PAST: sudah lewat
+        $pastActivities = Activity::where('company_code', $company->company_code)
+            ->whereDate('end_date', '<', $today)
+            ->orderByDesc('end_date')
+            ->get();
 
         return view('organizations.show', compact(
             'company',
-            'activities',
-            'ongoingCount',
-            'upcomingCount'
+            'ongoingActivities',
+            'upcomingActivities',
+            'pastActivities'
         ));
     }
 

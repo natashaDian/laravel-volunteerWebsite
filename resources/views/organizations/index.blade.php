@@ -128,6 +128,14 @@
                                                      border border-amber-200">
                                             ● {{ $company->upcoming_count ?? 0 }} Upcoming
                                         </span>
+
+                                        <span class="inline-flex items-center gap-1.5
+                                                     px-4 py-1.5 rounded-full
+                                                     bg-red-50 text-red-700
+                                                     text-xs font-semibold
+                                                     border border-red-200">
+                                            ● {{ $company->past_count ?? 0 }} Past
+                                        </span>
                                     </div>
                                 </div>
 

@@ -14,7 +14,6 @@ class ActivityRegistrationController extends Controller
     {
         $request->validate([
             'motivation' => 'nullable|string|max:500',
-            'phone' => 'nullable|string|max:20',
         ]);
 
         $alreadyRegistered = ActivityRegistration::where('user_id', Auth::id())
@@ -29,7 +28,6 @@ class ActivityRegistrationController extends Controller
             'user_id'     => Auth::id(),
             'activity_id' => $activity->id,
             'motivation'  => $request->motivation,
-            'phone'       => $request->phone,
             'status'      => 'pending',
         ]);
 
